@@ -1,0 +1,24 @@
+import axios from "axios";
+import logo from "../assets/images/logo.png";
+
+export const MainContent = {
+  name: "Bionova",
+  logo: logo,
+};
+export const backendConfig = {
+  // base: "http://192.168.29.191:8080/api",
+  // origin: "http://192.168.29.191:8080",
+  // base: "http://172.20.10.2:8080/api",
+  // origin: "http://172.20.10.2:8080",
+  base: "https://api.bionova.ai/api",
+  origin: "https://api.bionova.ai",
+};
+
+const token = localStorage.getItem("token");
+export const Axios = axios.create({
+  baseURL: backendConfig.base,
+  withCredentials: true,
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
