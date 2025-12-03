@@ -3,7 +3,7 @@ import defaultProfile from "../../assets/manageMembers/defaultProfile.png";
 import { useNavigate } from "react-router-dom";
 
 const MemberCard = (data) => {
-  const {email,joiningDate,mobile,name,role,status,toggles,_id} = data;
+  const {email,mobile,name,role,status,toggles,_id} = data;
 const navigate = useNavigate()
   return (
     <div className="rounded-xl bg-white min-h-80 flex flex-col justify-between">
