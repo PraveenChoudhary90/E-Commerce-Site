@@ -1,5 +1,6 @@
 import { Axios } from "../constants/mainContent";
 
+
 const apiUrl = "/products";
 export async function addCategory(payload) {
   const response = await Axios.post(`${apiUrl}/create-category`, payload);
