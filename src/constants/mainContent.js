@@ -12,14 +12,20 @@ export const backendConfig = {
   // origin: "http://172.20.10.2:8080",
   // origin: "https://api.bionova.ai",
   base: "http://localhost:5000/api/v1",
+  // base: "https://api.bionova.ai/api",
+  // origin: "https://api.bionova.ai",
+    //  base: "http://localhost:8000",
+
 
 };
 
 const token = localStorage.getItem("token");
 export const Axios = axios.create({
-  baseURL: backendConfig.base,
+  baseURL:"http://localhost:5000",
   withCredentials: true,
   headers: {
     Authorization: `Bearer ${token}`,
   },
 });
+
+

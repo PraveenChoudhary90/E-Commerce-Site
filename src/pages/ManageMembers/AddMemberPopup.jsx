@@ -1,22 +1,29 @@
 import React, { useEffect, useState } from "react";
 import InputField from "../../components/InputField";
-import SelectComponent from "../../components/SelectComponent";
 import ToggleButton from "../../components/ToggleButton";
 import Button from "../../components/Button";
-import { CreateMember, updateMember } from "../../api/auth-api";
+import { CreateMember, updateMember, deleteMember } from "../../api/auth-api";
 import PageLoader from "../../components/ui/PageLoader";
 import Swal from "sweetalert2";
+import { FaPen, FaTrash } from "react-icons/fa6";
 
-const AddMemberPopup = ({ onClose, editMode = false, data = {} }) => {
+const AddMemberPopup = ({
+  onClose,
+  onSuccess,
+  editMode = false,
+  data = {},
+}) => {
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState(false);
+  const [errors, setErrors] = useState({});
   const [payload, setPayload] = useState({
     name: "",
     email: "",
     mobile: "",
-    password: "",
-    role: "",
-    joiningDate: "",
+    aadhaarNumber: "",
+    panNumber: "",
+    aadhaarPic: null,
+    userPic: null,
+    panPic: null,
     emailOnFollow: false,
     emailOnPostAnswer: false,
     emailOnMention: false,
@@ -31,62 +38,102 @@ const AddMemberPopup = ({ onClose, editMode = false, data = {} }) => {
         name: data.name || "",
         email: data.email || "",
         mobile: data.mobile || "",
-        password: "",
-        role: data.role || "",
-        joiningDate: data.joiningDate ? data.joiningDate.split("T")[0] : "",
-        emailOnFollow: data.toggles.emailOnFollow || false,
-        emailOnPostAnswer: data.toggles.emailOnPostAnswer || false,
-        emailOnMention: data.toggles.emailOnMention || false,
-        notifyNewLaunches: data.toggles.notifyNewLaunches || false,
-        notifyProductUpdates: data.toggles.notifyProductUpdates || false,
-        subscribeToNewLetter: data.toggles.subscribeToNewsletter || false,
+        aadhaarNumber: data.aadhaarNumber || "",
+        panNumber: data.panNumber || "",
+        aadhaarPic: null,
+        userPic: null,
+        panPic: null,
+        emailOnFollow: data.permissions?.emailOnFollow || false,
+        emailOnPostAnswer: data.permissions?.emailOnPostAnswer || false,
+        emailOnMention: data.permissions?.emailOnMention || false,
+        notifyNewLaunches: data.permissions?.notifyNewLaunches || false,
+        notifyProductUpdates: data.permissions?.notifyProductUpdates || false,
+        subscribeToNewLetter: data.permissions?.subscribeToNewLetter || false,
       });
     }
   }, [editMode, data]);
 
   const validateFields = () => {
     let tempErrors = {};
-    if (!payload.name) tempErrors.name = "Member name is required!";
-    if (!payload.email) {
-        tempErrors.email = "Email is required!";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
-        tempErrors.email = "Enter a valid email!";
+    if (!payload.name) tempErrors.name = "Name is required!";
+    if (!payload.email) tempErrors.email = "Email is required!";
+    if (!payload.mobile) tempErrors.mobile = "Mobile number is required!";
+    if (!payload.aadhaarNumber)
+      tempErrors.aadhaarNumber = "Aadhaar number is required!";
+    if (!payload.panNumber) tempErrors.panNumber = "PAN number is required!";
+    else if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(payload.panNumber))
+      tempErrors.panNumber = "Enter valid PAN number! (ABCDE1234F)";
+    if (!editMode) {
+      if (!payload.aadhaarPic)
+        tempErrors.aadhaarPic = "Aadhaar photo required!";
+      if (!payload.userPic) tempErrors.userPic = "User photo required!";
+      if (!payload.panPic) tempErrors.panPic = "PAN photo required!";
     }
-
-    if (!payload.mobile) {
-        tempErrors.mobile = "Mobile number is required!";
-    } else if (!/^\d{10}$/.test(payload.mobile)) {
-        tempErrors.mobile = "Enter a valid 10-digit mobile number!";
-    }
-    if (!editMode && !payload.password) tempErrors.password = "Password is required!";
-    if (!payload.role) tempErrors.role = "Member role is required!";
-    if (!payload.joiningDate) tempErrors.joiningDate = "Joining Date is required!";
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
+  };
+
+  const handleDelete = async () => {
+    const confirm = await Swal.fire({
+      title: "Are you sure?",
+      text: "This member will be deleted permanently!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete!",
+      cancelButtonText: "Cancel",
+    });
+    if (!confirm.isConfirmed) return;
+    try {
+      setLoading(true);
+      await deleteMember(data._id);
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        timer: 1200,
+        showConfirmButton: false,
+      });
+      if (onSuccess) onSuccess(data._id);
+      onClose();
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error?.response?.data?.message || "Delete failed!",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAdd = async () => {
     if (!validateFields()) return;
     try {
       setLoading(true);
-
+      const formData = new FormData();
+      for (const key in payload)
+        if (payload[key] !== null) formData.append(key, payload[key]);
       if (editMode) {
-        await updateMember(data._id, payload);
+        const updatedMember = await updateMember(data._id, formData);
         Swal.fire({
           icon: "success",
           title: "Member Updated!",
-          text: "Member updated successfully",
-        }).then(() => window.location.reload());
+          timer: 1200,
+          showConfirmButton: false,
+        });
+        if (onSuccess) onSuccess(updatedMember);
       } else {
-        await CreateMember(payload);
+        const response = await CreateMember(formData);
+        const newMember = { _id: response._id, ...payload };
         Swal.fire({
           icon: "success",
           title: "Member Added!",
-          text: "Member added successfully",
-        }).then(() => window.location.reload());
+          timer: 1200,
+          showConfirmButton: false,
+        });
+        if (onSuccess) onSuccess(newMember);
       }
+      onClose();
     } catch (error) {
-      console.log(error);
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -97,149 +144,220 @@ const AddMemberPopup = ({ onClose, editMode = false, data = {} }) => {
     }
   };
 
-  const handleToggle = (key, value) => {
-    setPayload((prev) => ({ ...prev, [key]: value }));
-  };
-
   return (
     <>
       {loading && <PageLoader />}
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-        <div className="bg-white rounded-xl w-11/12 max-w-5xl p-5 space-y-3 relative">
-          <div className="flex items-center gap-5 justify-between">
-            <h2 className="text-xl font-medium mb-4">{editMode ? "Edit Member Profile" : "Add Member"}</h2>
-            <button className=" bg-red-500 w-10 h-10 rounded-full flex items-center justify-center" onClick={onClose}>
-              <div className="w-7 h-7 border-2 flex items-center justify-center rounded-full text-white text-2xl">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-start md:items-center overflow-auto z-50 p-4">
+        <div className="bg-white rounded-xl w-full max-w-5xl p-5 space-y-5 relative flex flex-col">
+          {/* Header */}
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold">
+              {editMode ? "Edit Member" : "Add Member"}
+            </h2>
+            <div className="flex items-center gap-4">
+              {editMode && (
+                <FaTrash
+                  className="text-red-500 text-xl cursor-pointer hover:text-red-700"
+                  onClick={handleDelete}
+                />
+              )}
+              <button onClick={onClose} className="text-3xl">
                 &times;
-              </div>
-            </button>
+              </button>
+            </div>
           </div>
-          <form action="" className="space-y-5">
-            <div className="bg-bg-color1 p-6 rounded-xl">
-              <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-                <div>
+
+          {/* Scrollable Content */}
+          <div className="overflow-y-auto max-h-[70vh] space-y-5">
+            <form className="space-y-5">
+              {/* Inputs */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="relative">
+                  <InputField
+                    label="Name"
+                    placeholder="Enter Name"
+                    value={payload.name}
+                    onChange={(e) =>
+                      setPayload({ ...payload, name: e.target.value })
+                    }
+                  />
+                  <FaPen className="absolute right-3 top-10 text-gray-400" />
+                  {errors.name && (
+                    <p className="text-red-500 text-sm">{errors.name}</p>
+                  )}
+                </div>
                 <InputField
-                  placeholder={"Enter Name"}
-                  label={"Name"}
-                  type="text"
-                  onChange={(e) => setPayload({ ...payload, name: e.target.value })}
-                  value={payload.name}
-                />
-                 {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-                </div>
-               <div>
-               <InputField
-                  placeholder={"Enter Email"}
-                  label={"Email"}
-                  type="email"
-                  onChange={(e) => setPayload({ ...payload, email: e.target.value })}
+                  label="Email"
+                  placeholder="Enter Email"
                   value={payload.email}
+                  onChange={(e) =>
+                    setPayload({ ...payload, email: e.target.value })
+                  }
                 />
-                {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-               </div>
-               <div>
-               <InputField
-                  placeholder={"Enter Number"}
-                  label={"Mobile"}
-                  type="number"
-                  onChange={(e) => setPayload({ ...payload, mobile: e.target.value })}
+                {errors.email && <p className="text-red-500">{errors.email}</p>}
+                <InputField
+                  label="Mobile"
+                  placeholder="Enter Mobile Number"
                   value={payload.mobile}
+                  onChange={(e) =>
+                    setPayload({ ...payload, mobile: e.target.value })
+                  }
                 />
-                {errors.mobile && <p className="text-red-500 text-sm">{errors.mobile}</p>}
-               </div>
-<div>
-{!editMode && (
-                 <>
-                 <InputField placeholder="Enter Your Password" label="Generate Password" type="password" onChange={(e) => setPayload({ ...payload, password: e.target.value })} value={payload.password}/>
-                 {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
-             </>
+                {errors.mobile && (
+                  <p className="text-red-500">{errors.mobile}</p>
                 )}
-</div>
-             <div>
-             <SelectComponent
-                  onChange={(e) => setPayload({ ...payload, role: e.target.value })}
-                  value={payload.role}
-                  label="Assign Role"
-                  options={[
-                    { value: "-- Select Role --", label: "-- Select Role --" },
-                    { value: "management", label: "Management" },
-                  ]}
+                <InputField
+                  label="Aadhaar Number"
+                  placeholder="Enter Aadhaar Number"
+                  value={payload.aadhaarNumber}
+                  onChange={(e) =>
+                    setPayload({ ...payload, aadhaarNumber: e.target.value })
+                  }
                 />
-                 {errors.role && <p className="text-red-500 text-sm">{errors.role}</p>}
-             </div>
-          
-<div>
-<InputField
-                  value={payload.joiningDate}
-                  placeholder={"Enter Your Joining Date"}
-                  label={"Joining Date"}
-                  type="date"
-                  onChange={(e) => setPayload({ ...payload, joiningDate: e.target.value })}
-                />
-                 {errors.joiningDate && <p className="text-red-500 text-sm">{errors.joiningDate}</p>}
-</div>
-              
+                {errors.aadhaarNumber && (
+                  <p className="text-red-500">{errors.aadhaarNumber}</p>
+                )}
+                <div className="relative">
+                  <InputField
+                    label="PAN Number"
+                    placeholder="Enter PAN Number"
+                    value={payload.panNumber}
+                    onChange={(e) =>
+                      setPayload({
+                        ...payload,
+                        panNumber: e.target.value.toUpperCase(),
+                      })
+                    }
+                  />
+                  <FaPen className="absolute right-3 top-10 text-gray-400" />
+                  {errors.panNumber && (
+                    <p className="text-red-500">{errors.panNumber}</p>
+                  )}
+                </div>
+                <div>
+                  <label>Aadhaar Photo</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      setPayload({ ...payload, aadhaarPic: e.target.files[0] })
+                    }
+                  />
+                  {errors.aadhaarPic && (
+                    <p className="text-red-500">{errors.aadhaarPic}</p>
+                  )}
+                </div>
+                <div>
+                  <label>PAN Photo</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      setPayload({ ...payload, panPic: e.target.files[0] })
+                    }
+                  />
+                  {errors.panPic && (
+                    <p className="text-red-500">{errors.panPic}</p>
+                  )}
+                </div>
+                <div>
+                  <label>User Photo</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      setPayload({ ...payload, userPic: e.target.files[0] })
+                    }
+                  />
+                  {errors.userPic && (
+                    <p className="text-red-500">{errors.userPic}</p>
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="max-w-3xl mx-auto  space-y-4">
-              <h1 className="text-center text-sm md:text-lg font-medium">Assign Permissions</h1>
-              <div className="grid lg:grid-cols-2 gap-5 grid-cols-1">
-                <div className="text-gray-400 space-y-4">
-                  <h1 className="">ACCOUNT</h1>
-                  <div className="space-y-3">
-                    <div className="flex gap-2 items-center">
-                      <ToggleButton
-                        isEnabled={payload.emailOnFollow}
-                        onToggle={(value) => handleToggle("emailOnFollow", value)}
-                      />
-                      <p className="text-sm">Email me when someone follows me</p>
+
+              {/* Permissions */}
+              <div className="space-y-4">
+                <h1 className="text-center text-sm md:text-lg font-medium">
+                  Assign Permissions
+                </h1>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                  <div className="text-gray-400 space-y-4">
+                    <h1>ACCOUNT</h1>
+                    <div className="space-y-3">
+                      <div className="flex gap-2 items-center">
+                        <ToggleButton
+                          isEnabled={payload.emailOnFollow}
+                          onToggle={(v) =>
+                            setPayload({ ...payload, emailOnFollow: v })
+                          }
+                        />
+                        <p>Email me when someone follows me</p>
+                      </div>
+                      <div className="flex gap-2 items-center">
+                        <ToggleButton
+                          isEnabled={payload.emailOnPostAnswer}
+                          onToggle={(v) =>
+                            setPayload({ ...payload, emailOnPostAnswer: v })
+                          }
+                        />
+                        <p>Email me when someone answers on my post</p>
+                      </div>
+                      <div className="flex gap-2 items-center">
+                        <ToggleButton
+                          isEnabled={payload.emailOnMention}
+                          onToggle={(v) =>
+                            setPayload({ ...payload, emailOnMention: v })
+                          }
+                        />
+                        <p>Email me when someone mentions me</p>
+                      </div>
                     </div>
-                    <div className="flex gap-2 items-center">
-                      <ToggleButton
-                        isEnabled={payload.emailOnPostAnswer}
-                        onToggle={(value) => handleToggle("emailOnPostAnswer", value)}
-                      />
-                      <p className="text-sm">Email me when someone answers on my post</p>
-                    </div>
-                    <div className="flex gap-2 items-center">
-                      <ToggleButton
-                        isEnabled={payload.emailOnMention}
-                        onToggle={(value) => handleToggle("emailOnMention", value)}
-                      />
-                      <p className="text-sm">Email me when someone mentions me</p>
+                  </div>
+                  <div className="text-gray-400 space-y-4">
+                    <h1>NOTIFICATIONS</h1>
+                    <div className="space-y-3">
+                      <div className="flex gap-2 items-center">
+                        <ToggleButton
+                          isEnabled={payload.notifyNewLaunches}
+                          onToggle={(v) =>
+                            setPayload({ ...payload, notifyNewLaunches: v })
+                          }
+                        />
+                        <p>New launches & projects</p>
+                      </div>
+                      <div className="flex gap-2 items-center">
+                        <ToggleButton
+                          isEnabled={payload.notifyProductUpdates}
+                          onToggle={(v) =>
+                            setPayload({ ...payload, notifyProductUpdates: v })
+                          }
+                        />
+                        <p>Monthly product updates</p>
+                      </div>
+                      <div className="flex gap-2 items-center">
+                        <ToggleButton
+                          isEnabled={payload.subscribeToNewLetter}
+                          onToggle={(v) =>
+                            setPayload({ ...payload, subscribeToNewLetter: v })
+                          }
+                        />
+                        <p>Subscribe to newsletter</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="text-gray-400 space-y-4 mb-5">
-                  <h1 className="">ACCOUNT</h1>
-                  <div className="space-y-3">
-                    <div className="flex gap-2 items-center">
-                      <ToggleButton
-                        isEnabled={payload.notifyNewLaunches}
-                        onToggle={(value) => handleToggle("notifyNewLaunches", value)}
-                      />
-                      <p className="text-sm">New launches and projects</p>
-                    </div>
-                    <div className="flex gap-2 items-center">
-                      <ToggleButton
-                        isEnabled={payload.notifyProductUpdates}
-                        onToggle={(value) => handleToggle("notifyProductUpdates", value)}
-                      />
-                      <p className="text-sm">Monthly product updates</p>
-                    </div>
-                    <div className="flex gap-2 items-center">
-                      <ToggleButton
-                        isEnabled={payload.subscribeToNewLetter}
-                        onToggle={(value) => handleToggle("subscribeToNewLetter", value)}
-                      />
-                      <p className="text-sm">Subscribe to newsletter</p>
-                    </div>
-                  </div>
-                </div>
               </div>
-              <Button title={editMode ? "Edit" : "Create Members"} onClick={handleAdd} className="w-fit m-auto py-3" />
-            </div>
-          </form>
+            </form>
+          </div>
+
+          {/* Submit Button always visible */}
+          <div className="sticky bottom-0 bg-white py-3 text-center border-t mt-2">
+            <Button
+              title={editMode ? "Update" : "Create Member"}
+              onClick={handleAdd}
+              className="w-full md:w-1/3 m-auto py-3"
+            />
+          </div>
         </div>
       </div>
     </>

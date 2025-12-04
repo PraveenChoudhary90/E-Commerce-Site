@@ -101,9 +101,9 @@ const Layout = () => {
         },
         {
             path: Routers.MANAGE_MEMBERS,
-            label: "Staff Management",
+            label: "User Management",
             icon: <MdManageAccounts />,
-        },
+        }
     ];
 
     const actionButtons = [

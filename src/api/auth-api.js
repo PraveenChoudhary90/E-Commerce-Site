@@ -4,6 +4,12 @@ import { Axios } from "../constants/mainContent";
 export async function loginWithEmailAdmin(payload) {
   const response = await Axios.post("/auth/login", payload);
   return response?.data;
+const apiUrl = "/admin";
+
+export async function loginWithEmailAdmin(payload) {
+    const response = await Axios.post(`${apiUrl}/login`, payload);
+    return response.data;
+
 }
 
 export async function getAdminInfo() {
