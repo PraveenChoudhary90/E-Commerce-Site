@@ -10,11 +10,11 @@ const ManageMemberHead = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [memberData, setMemberData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [editData, setEditData] = useState(null); 
+  const [editData, setEditData] = useState(null);
 
   const togglePopup = () => {
     setShowPopup(!showPopup);
-    if (!showPopup) setEditData(null); 
+    if (!showPopup) setEditData(null);
   };
 
   useEffect(() => {
@@ -24,6 +24,7 @@ const ManageMemberHead = () => {
       .finally(() => setLoading(false));
   }, []);
 
+  // ADD / UPDATE
   const handleAddOrUpdateMember = (member) => {
     if (editData) {
       setMemberData((prev) =>
@@ -32,6 +33,13 @@ const ManageMemberHead = () => {
     } else {
       setMemberData((prev) => [member, ...prev]);
     }
+    setShowPopup(false);
+    setEditData(null);
+  };
+
+  // ⭐ DELETE HANDLER
+  const handleDeleteMember = (id) => {
+    setMemberData((prev) => prev.filter((m) => m._id !== id));
     setShowPopup(false);
     setEditData(null);
   };
@@ -74,7 +82,7 @@ const ManageMemberHead = () => {
           {showPopup && (
             <AddMemberPopup
               onClose={togglePopup}
-              onSuccess={handleAddOrUpdateMember}
+              onSuccess={editData ? handleDeleteMember : handleAddOrUpdateMember}
               editMode={!!editData}
               data={editData}
             />
