@@ -1,17 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { addBanner, getDetails, updateBanner } from "../../api/product-management-api";
-import { imageBase64Convertor } from "../../utils/additionalFunction";
 import Swal from "sweetalert2";
 import PageLoader from "../../components/ui/PageLoader";
 
-const EditBanner = ({ title, bannerData , onClick , editmode = false}) => {
+const DEFAULT_BANNER_TYPES = [
+  { value: "hero", label: "Hero" },
+  { value: "carousel", label: "Carousel" },
+  { value: "sidebar", label: "Sidebar" },
+  { value: "footer", label: "Footer" },
+  { value: "popup", label: "Popup" },
+  { value: "custom", label: "Custom (enter below)" },
+];
+
+const EditBanner = ({ title, bannerData, onClick, editmode = false }) => {
   const [select, setSelect] = useState({});
   const [banners, setBanners] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (bannerData) {
-      setBanners([bannerData]);
+      // Ensure existing banner has banner_type (fallback to hero)
+      const bannerWithType = {
+        ...bannerData,
+        banner_type: bannerData.banner_type ?? "hero",
+        custom_banner_type: bannerData.banner_type_custom ?? "",
+        images: bannerData.images ?? [],
+      };
+      setBanners([bannerWithType]);
     } else {
       setBanners([
         {
@@ -20,6 +35,8 @@ const EditBanner = ({ title, bannerData , onClick , editmode = false}) => {
           images: [],
           banner_name: "",
           banner_page: "",
+          banner_type: "hero", // default
+          custom_banner_type: "", // text input if type === 'custom'
         },
       ]);
     }
@@ -32,6 +49,8 @@ const EditBanner = ({ title, bannerData , onClick , editmode = false}) => {
       images: [],
       banner_name: "",
       banner_page: "",
+      banner_type: "hero",
+      custom_banner_type: "",
     };
     setBanners([...banners, newBanner]);
   };
@@ -41,10 +60,10 @@ const EditBanner = ({ title, bannerData , onClick , editmode = false}) => {
       prevBanners.map((banner) => (banner.id === id ? { ...banner, [field]: value } : banner))
     );
   };
+
   const handleImageUpload = async (id, event) => {
     const files = Array.from(event.target.files);
-  
-    // Convert files to base64
+
     const base64Images = await Promise.all(
       files.map(
         (file) =>
@@ -55,22 +74,28 @@ const EditBanner = ({ title, bannerData , onClick , editmode = false}) => {
           })
       )
     );
-  
-    // Update state with new images added to the existing ones
+
     setBanners((prevBanners) =>
       prevBanners.map((banner) =>
-        banner.id === id
-          ? { ...banner, images: [...banner.images, ...base64Images] } // Append new images to existing ones
-          : banner
+        banner.id === id ? { ...banner, images: [...banner.images, ...base64Images] } : banner
       )
     );
   };
-  
-  
 
   const handleBannerSave = async () => {
+    // Normalize banner_type: if 'custom' chosen, prefer custom_banner_type value
+    const payload = banners.map((b) => {
+      const finalType = b.banner_type === "custom" ? (b.custom_banner_type || "custom") : b.banner_type;
+      return {
+        ...b,
+        banner_type: finalType,
+        // remove helper key before sending if needed by API
+        custom_banner_type: undefined,
+      };
+    });
+
     if (bannerData) {
-      const updatedBanner = banners[0];
+      const updatedBanner = payload[0];
       try {
         setLoading(true);
         await updateBanner(bannerData._id, updatedBanner);
@@ -92,7 +117,7 @@ const EditBanner = ({ title, bannerData , onClick , editmode = false}) => {
     } else {
       try {
         setLoading(true);
-        await addBanner(banners);
+        await addBanner(payload);
         Swal.fire({
           icon: "success",
           title: "Banner saved!",
@@ -129,30 +154,33 @@ const EditBanner = ({ title, bannerData , onClick , editmode = false}) => {
     );
   };
 
-
   return (
     <>
       {loading && <PageLoader />}
       <div className="bg-white p-4 rounded-xl space-y-7">
         <div className="flex items-center gap-5 justify-between">
           <h2 className="lg:text-2xl text-xl font-medium mb-4">{title}</h2>
-        {!editmode && (<button onClick={onClick} className="bg-red-500 w-8 h-8 rounded-full flex items-center justify-center">
-            <div className="w-full h-full flex items-center justify-center rounded-full text-white text-2xl">
-              &times;
-            </div>
-          </button>)}  
+          {!editmode && (
+            <button onClick={onClick} className="bg-red-500 w-8 h-8 rounded-full flex items-center justify-center">
+              <div className="w-full h-full flex items-center justify-center rounded-full text-white text-2xl">
+                &times;
+              </div>
+            </button>
+          )}
         </div>
+
         {banners?.map((banner) => (
           <div key={banner.id} className="grid gap-5 grid-cols-2">
-            <div className="bg-white rounded-lg  border overflow-hidden">
+            <div className="bg-white rounded-lg border overflow-hidden">
               {banner.images.length > 0 && (
                 <div className="flex flex-wrap gap-2 p-2">
                   {banner.images.map((img, index) => (
                     <div key={index} className="relative">
                       <img src={img} alt="Banner Preview" className="w-24 h-24 object-cover rounded-md" />
                       <button
-                        onClick={() => removeImage(banner.id, index)} // Delete image
+                        onClick={() => removeImage(banner.id, index)}
                         className="absolute top-0 right-0 bg-red-500 text-white rounded-full text-xs p-1"
+                        type="button"
                       >
                         X
                       </button>
@@ -168,6 +196,7 @@ const EditBanner = ({ title, bannerData , onClick , editmode = false}) => {
                 <button
                   onClick={() => removeSlide(banner.id)}
                   className="px-4 py-2 bg-red-500 text-sm text-white rounded-md shadow hover:bg-red-600"
+                  type="button"
                 >
                   Delete Slide
                 </button>
@@ -183,6 +212,7 @@ const EditBanner = ({ title, bannerData , onClick , editmode = false}) => {
                     onChange={(e) => handleImageUpload(banner.id, e)}
                   />
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium mb-2">Banner Name</label>
                   <input
@@ -192,6 +222,7 @@ const EditBanner = ({ title, bannerData , onClick , editmode = false}) => {
                     onChange={(e) => handleInputChange(banner.id, "banner_name", e.target.value)}
                   />
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium mb-2">Banner Page</label>
                   <input
@@ -200,6 +231,35 @@ const EditBanner = ({ title, bannerData , onClick , editmode = false}) => {
                     className="w-full px-4 py-2 border rounded-md"
                     onChange={(e) => handleInputChange(banner.id, "banner_page", e.target.value)}
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Banner Type</label>
+                  <select
+                    value={banner.banner_type}
+                    onChange={(e) => handleInputChange(banner.id, "banner_type", e.target.value)}
+                    className="w-full px-4 py-2 border rounded-md"
+                  >
+                    {DEFAULT_BANNER_TYPES.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* Show custom type text input when 'custom' selected */}
+                  {banner.banner_type === "custom" && (
+                    <div className="mt-2">
+                      <label className="block text-sm font-medium mb-1">Custom Type</label>
+                      <input
+                        type="text"
+                        value={banner.custom_banner_type}
+                        placeholder="Enter custom banner type"
+                        className="w-full px-4 py-2 border rounded-md"
+                        onChange={(e) => handleInputChange(banner.id, "custom_banner_type", e.target.value)}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -210,6 +270,7 @@ const EditBanner = ({ title, bannerData , onClick , editmode = false}) => {
           <button
             onClick={addNewSlide}
             className="px-4 py-2 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600"
+            type="button"
           >
             Add More Slides
           </button>
@@ -217,6 +278,7 @@ const EditBanner = ({ title, bannerData , onClick , editmode = false}) => {
           <button
             onClick={handleBannerSave}
             className="px-6 py-2 bg-green-400 text-white rounded-md shadow hover:bg-green-600"
+            type="button"
           >
             {bannerData ? "Update Banner" : "Save Banner"}
           </button>

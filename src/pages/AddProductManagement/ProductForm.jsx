@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import InputField from "../../components/InputField";
 import {
     addProductForm,
-    getBrandsList,
+   
     getCategoryList,
-    getProductTypeList,
+   
     getVariantsList,
     updateProduct,
 } from "../../api/product-management-api";
@@ -22,13 +22,13 @@ import { MdDeleteForever } from "react-icons/md";
 const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, currentPage }) => {
     const initialState = {
         product_category: [],
-        product_type: "",
-        product_brand: "",
+        
         combination: "",
         product_variant: "",
         pack_type: "",
         pack_size: "",
         hsn: "",
+        stock:"",
         gst_in_percentage: 0,
         product_mrp: 0,
         franchisee_price: 0,
@@ -38,11 +38,11 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
     };
     const [errors, setErrors] = useState("");
     const [payload, setPayload] = useState({
-        ...initialState, // <-- Ensure all fields are initialized
+        ...initialState, 
         images: productData?.images || [],
     });
     const [producttypeOptions, setProductTypeOptions] = useState([]);
-    const [brandsOptions, setBrandsOptions] = useState([]);
+   
     const [loading, setLoading] = useState(false);
     const [productVariant, setProductVariant] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -58,10 +58,8 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
                     getCategoryList(),
                 ]);
                 setProductVariant(variants);
+                console.log(categoryList)
                 setCategories(categoryList);
-
-                const brands = await getBrandsList();
-                setBrandsOptions(brands);
             } catch (error) {
                 console.error("Error fetching initial data:", error);
                 Swal.fire({
@@ -81,11 +79,11 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
         if (isEditMode && productData) {
             setPayload({
                 product_category: productData?.category || "",
-                product_type: productData?.type?._id || "",
-                product_brand: productData?.brand || "",
+                
                 product_variant: productData?.variant?._id || "",
                 pack_type: productData?.pack_size || "",
                 pack_size: productData?.pack_type || "",
+                stock:productData?.stock||"",
                 product_name: productData?.name || "",
                 product_mrp: productData?.price || 0,
                 franchisee_price: productData?.franchiseePrice || 0,
@@ -173,10 +171,7 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
 
         if (!payload.product_category || payload.product_category.length === 0)
             tempErrors.product_category = "Product Category is required!";
-        if (!payload.product_type)
-            tempErrors.product_type = "Product License is required!";
-        if (!payload.product_brand)
-            tempErrors.product_brand = "Product Brand is required!";
+        
         if (!payload.product_variant) {
             tempErrors.product_variant = "Product Dosage is required!";
             console.log(tempErrors.product_variant)
@@ -184,6 +179,7 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
         if (!payload.combination)
             tempErrors.combination = "Product Combination is required!";
         if (!payload.pack_type) tempErrors.pack_type = "Pack Type is required!";
+         if (!payload.stock) tempErrors.stock = "Pack Type is required!";
         if (!payload.pack_size) tempErrors.pack_size = "Pack Size is required!";
         if (!payload.product_mrp || payload.product_mrp <= 0) {
             tempErrors.product_mrp = "Valid MRP is required!";
@@ -258,11 +254,11 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
         }
     }, [productData]);
 
-    console.log(payload)
+    console.log(categories)
 
     // console.log("productData", categories);
     const options =
-        categories?.map((category) => ({
+        categories?.categories?.map((category) => ({
             value: category._id,
             label: category.name,
         })) || [];
@@ -272,20 +268,7 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
             {loading && <PageLoader />}
             <div className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    <InputField
-                        label="Enter Brand"
-                        name=""
-                        value={payload.product_brand}
-                        onChange={(e) =>
-                            setPayload({
-                                ...payload,
-                                product_brand: e.target.value,
-                            })
-                        }
-                        placeholder=""
-                        type="text"
-                        error={errors.product_brand && errors.product_brand}
-                    />
+                   
                     <InputField
                         label="Product ID"
                         name=""
@@ -390,6 +373,20 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
                         placeholder=""
                         type="text"
                         error={errors.pack_type && errors.pack_type}
+                    />
+                    <InputField
+                        label="Enter stock"
+                        name=""
+                        value={payload.stock}
+                        onChange={(e) =>
+                            setPayload({
+                                ...payload,
+                                stock: e.target.value,
+                            })
+                        }
+                        placeholder=""
+                        type="number"
+                        error={errors.stock && errors.stock}
                     />
                     <InputField
                         label="Enter Pack Size"

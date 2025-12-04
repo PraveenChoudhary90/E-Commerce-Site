@@ -10,6 +10,8 @@ export const backendConfig = {
   // origin: "http://192.168.29.191:8080",
   // base: "http://172.20.10.2:8080/api",
   // origin: "http://172.20.10.2:8080",
+  // origin: "https://api.bionova.ai",
+  base: "http://localhost:5000/api/v1",
   // base: "https://api.bionova.ai/api",
   // origin: "https://api.bionova.ai",
     //  base: "http://localhost:8000",

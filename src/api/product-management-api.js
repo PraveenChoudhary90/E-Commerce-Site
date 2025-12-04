@@ -1,4 +1,4 @@
-import { Axios } from "../constants/mainContent";
+import { Axios } from "../constants/mainContent.js";
 
 
 const apiUrl = "/products";
@@ -26,6 +26,7 @@ export async function deleteVariant(id) {
   const response = await Axios.delete(`${apiUrl}/delete-variant/${id}`);
   return response?.data;
 }
+
 
 
 export async function addCategoryBrand(payload) {
@@ -58,20 +59,20 @@ export async function getCategoryList() {
   return response?.data;
 }
 
-export async function getBrandsList() {
-  const response = await Axios.get(`${apiUrl}/get-brands`);
-  return response?.data;
-}
+// export async function getBrandsList() {
+//   const response = await Axios.get(`${apiUrl}/get-brands`);
+//   return response?.data;
+// }
 
 export async function addProductType(payload) {
   const response = await Axios.post(`${apiUrl}/create-type`, payload);
   return response?.data;
 }
 
-export async function getProductTypeList() {
-  const response = await Axios.get(`${apiUrl}/get-types`);
-  return response?.data;
-}
+// export async function getProductTypeList() {
+//   const response = await Axios.get(`${apiUrl}/get-types`);
+//   return response?.data;
+// }
 
 
 export async function getBrandWithTypes(types) {

@@ -145,11 +145,16 @@ const BannerList = () => {
                                 : banners?.map((member, index) => (
                                       <tr key={index} className="border-b">
                                           <td className="p-3">
-                                              <img
-                                                  src={member.images[0]}
-                                                  className="w-full h-10 object-cover rounded-md"
-                                                  alt=""
-                                              />
+                                             <img
+                                    src={member.images[0]}
+                                    alt={`Preview ${index}`}
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src =
+                                            "https://coffective.com/wp-content/uploads/2018/06/default-featured-image.png.jpg";
+                                    }}
+                                    className="p-3 text-center font-light"
+                                />
                                           </td>
                                           <td className="p-3 text-center font-light">
                                               {index + 1}
