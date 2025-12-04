@@ -5,15 +5,15 @@ import { MdDelete } from "react-icons/md";
 import { FiEdit } from "react-icons/fi";
 
 import {
-    addNewBrand,
+   
     addProductType,
     addVariant,
     deleteCategoryType,
     deleteVariant,
     editVariant,
-    getBrandsList,
+   
     getCategoryList,
-    getProductTypeList,
+   
     getVariantsList,
 } from "../../api/product-management-api";
 import Swal from "sweetalert2";
@@ -26,8 +26,7 @@ import PageLoader from "../../components/ui/PageLoader";
 const tabs = [
     "Add Product",
     "Add Category",
-    "Add License",
-    "Add Brand",
+   
     "Add Dosage",
 ];
 
@@ -36,7 +35,7 @@ export default function AddProductManagement() {
         Number(localStorage.getItem("activeTab")) || 0
     );
     const [categories, setCategories] = useState([]);
-    const [brands, setBrands] = useState([]);
+    
     const [types, setTypes] = useState([]);
     const [producttype, setProductType] = useState("");
     const [brandInput, setBrandInput] = useState("");
@@ -45,7 +44,7 @@ export default function AddProductManagement() {
     const [productVariantInput, setProductVariantInput] = useState("");
     const [productVariant, setProductVariant] = useState([]);
     const [showEditForm, setShowEditForm] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState([]);
 
     const [selectCategory, setSelectCategory] = useState("");
 
@@ -69,8 +68,8 @@ export default function AddProductManagement() {
     useEffect(() => {
         fetchFuncHandler(getVariantsList, setProductVariant);
         fetchFuncHandler(getCategoryList, setCategories);
-        fetchFuncHandler(getBrandsList, setBrands);
-        fetchFuncHandler(getProductTypeList, setTypes);
+        
+        
     }, []);
 
     const ProductTypevalidateFields = () => {
@@ -161,58 +160,58 @@ export default function AddProductManagement() {
         }
     };
 
-    const BrandvalidateFields = () => {
-        if (brandInput === "") {
-            Swal.fire({
-                title: "Error",
-                text: "Brand type is required!",
-                icon: "error",
-                confirmButtonText: "OK",
-            });
-            return false;
-        }
+    
+    //     if (brandInput === "") {
+    //         Swal.fire({
+    //             title: "Error",
+    //             text: "Brand type is required!",
+    //             icon: "error",
+    //             confirmButtonText: "OK",
+    //         });
+    //         return false;
+    //     }
 
-        if (image === "") {
-            Swal.fire({
-                title: "Error",
-                text: "brand image is required!",
-                icon: "error",
-                confirmButtonText: "OK",
-            });
-            return false;
-        }
+    //     if (image === "") {
+    //         Swal.fire({
+    //             title: "Error",
+    //             text: "brand image is required!",
+    //             icon: "error",
+    //             confirmButtonText: "OK",
+    //         });
+    //         return false;
+    //     }
 
-        return true;
-    };
-    const Brandpayload = {
-        name: brandInput,
-        image: image,
-    };
+    //     return true;
+    // };
+    // const Brandpayload = {
+    //     name: brandInput,
+    //     image: image,
+    // };
 
-    const handleBrandSave = async () => {
-        if (!BrandvalidateFields()) return;
-        try {
-            setLoading(true);
-            await addNewBrand(Brandpayload);
-            Swal.fire({
-                icon: "success",
-                title: "New Brand Added!",
-                text: "New Brand Successfully",
-            }).then(() => {
-                setBrandInput("");
-                setImage("");
-            });
-        } catch (error) {
-            console.log(error);
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: error?.response?.data?.message || "Something went wrong",
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
+    // const handleBrandSave = async () => {
+    //     if (!BrandvalidateFields()) return;
+    //     try {
+    //         setLoading(true);
+    //         await addNewBrand(Brandpayload);
+    //         Swal.fire({
+    //             icon: "success",
+    //             title: "New Brand Added!",
+    //             text: "New Brand Successfully",
+    //         }).then(() => {
+    //             setBrandInput("");
+    //             setImage("");
+    //         });
+    //     } catch (error) {
+    //         console.log(error);
+    //         Swal.fire({
+    //             icon: "error",
+    //             title: "Error",
+    //             text: error?.response?.data?.message || "Something went wrong",
+    //         });
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
     const handleDelete = async (id) => {
         try {
             setLoading(true);
@@ -305,7 +304,7 @@ export default function AddProductManagement() {
                                         Created Product Category
                                     </h2>
                                     <div className="flex flex-wrap gap-2">
-                                        {categories?.map((category, index) => (
+                                        {Array.isArray(categories) && categories.map((category, index)  => (
                                             <div
                                                 key={index}
                                                 className="px-3 py-1 bg-white text-[#616161] border rounded-md flex gap-2 items-center justify-center"

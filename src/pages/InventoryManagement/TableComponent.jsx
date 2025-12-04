@@ -62,13 +62,13 @@ const TableComponent = ({ title, data }) => {
 
     const filteredData = data.filter(
         (item) =>
-            item?.category?.name.toLowerCase().includes(searchInput.toLowerCase()) ||
-            item?.brand?.name.toLowerCase().includes(searchInput.toLowerCase()) ||
-            item?.name.toLowerCase().includes(searchInput.toLowerCase()) ||
-            item?.productId.toLowerCase().includes(searchInput.toLowerCase())
+            item?.category?.name?.toLowerCase().includes(searchInput?.toLowerCase()) ||
+            item?.brand?.name?.toLowerCase().includes(searchInput?.toLowerCase()) ||
+            item?.name?.toLowerCase().includes(searchInput?.toLowerCase()) ||
+            item?.productId?.toLowerCase().includes(searchInput?.toLowerCase())
     );
 
-    // console.log(filteredData);
+    
     
 
     const totalPages = Math.ceil(data.length / rowsPerPage);
@@ -163,7 +163,16 @@ const TableComponent = ({ title, data }) => {
                                                     className="w-auto h-10 object-cover rounded"
                                                 />
                                             </td>
-                                            <td className="border border-gray-300 p-2 font-light">{item?.category?.name}</td>
+                                           <td className="p-2 font-light grid gap-1">
+                                              {item?.product_category?.map((cat) => (
+                                                  <span
+                                                      key={cat._id}
+                                                      className="bg-gray-200 text-xs p-1 rounded-md mr-1 w-fit"
+                                                  >
+                                                      {cat.name}
+                                                  </span>
+                                              ))}
+                                          </td>
                                             <td className="border border-gray-300 p-2 font-light">{item?.type?.name}</td>
                                             <td className="border border-gray-300 p-2 font-light">{item?.brand?.name}</td>
                                             <td className="border border-gray-300 p-2 font-light">{item?.name}</td>

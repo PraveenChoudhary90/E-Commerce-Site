@@ -51,12 +51,12 @@ const InventoryHero = ({ data }) => {
 
 
 
-  const months = data.map(item => {
+  const months = data?.map(item => {
     const date = new Date(item.updatedAt);
     return date.toLocaleString("en-US", { month: "short" });
   });
 
-  const stockValues = data.map(item => item.stock);
+  const stockValues = data?.map(item => item.stock);
 
   const lineData = {
     labels: months,
@@ -72,6 +72,7 @@ const InventoryHero = ({ data }) => {
   };
 
   const products = data.slice(0, 7);
+  console.log(products)
 
   const variantCount = data.reduce((acc, product) => {
     const key = product?.variant?.name;

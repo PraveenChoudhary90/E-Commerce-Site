@@ -39,7 +39,7 @@ import GalleryManagement from "./pages/GalleryManagement/GalleryManagement";
 
 
 const RoutersPages = () => {
-  const token = "localStorage.getItem()";
+  const token = localStorage.getItem("token");
   return (
     <div>
       <ScrollToTop />
