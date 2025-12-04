@@ -21,7 +21,7 @@ export const backendConfig = {
 
 const token = localStorage.getItem("token");
 export const Axios = axios.create({
-  baseURL:"http://localhost:5000",
+  baseURL:"http://localhost:5000/api/v1",
   withCredentials: true,
   headers: {
     Authorization: `Bearer ${token}`,
