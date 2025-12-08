@@ -4,9 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import InputField from "../../components/InputField";
 import {
     addProductForm,
-   
     getCategoryList,
-   
     getVariantsList,
     updateProduct,
 } from "../../api/product-management-api";
@@ -22,7 +20,6 @@ import { MdDeleteForever } from "react-icons/md";
 const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, currentPage }) => {
     const initialState = {
         product_category: [],
-        
         combination: "",
         product_variant: "",
         pack_type: "",
@@ -42,11 +39,11 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
         images: productData?.images || [],
     });
     const [producttypeOptions, setProductTypeOptions] = useState([]);
-   
     const [loading, setLoading] = useState(false);
     const [productVariant, setProductVariant] = useState([]);
     const [categories, setCategories] = useState([]);
     const [base64Images, setBase64Images] = useState([]);
+    const [selectedFiles, setSelectedFiles] = useState([]);
     const fileInputRef = useRef(null);
 
     useEffect(() => {
@@ -58,7 +55,6 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
                     getCategoryList(),
                 ]);
                 setProductVariant(variants);
-                console.log(categoryList)
                 setCategories(categoryList);
             } catch (error) {
                 console.error("Error fetching initial data:", error);
@@ -79,11 +75,10 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
         if (isEditMode && productData) {
             setPayload({
                 product_category: productData?.category || "",
-                
                 product_variant: productData?.variant?._id || "",
                 pack_type: productData?.pack_size || "",
                 pack_size: productData?.pack_type || "",
-                stock:productData?.stock||"",
+                stock: productData?.stock || "",
                 product_name: productData?.name || "",
                 product_mrp: productData?.price || 0,
                 franchisee_price: productData?.franchiseePrice || 0,
@@ -98,61 +93,26 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
         }
     }, [isEditMode, productData]);
 
-
-    useEffect(() => {
-        const fetchProductTypes = async () => {
-            if (payload.product_category) {
-                try {
-                    const types = await getProductTypeList(
-                        payload.product_category
-                    );
-                    setProductTypeOptions(types);
-                } catch (error) {
-                    console.error("Error fetching product types:", error);
-                }
-            }
-        };
-
-        fetchProductTypes();
-    }, []);
-
-
-    const handleImageChange = async (event) => {
+    const handleImageChange = (event) => {
         const files = Array.from(event.target.files);
         const maxSize = 5 * 1024 * 1024; // 5MB
 
-        try {
-            const validFiles = files.filter((file) => {
-                if (file.size > maxSize) {
-                    Swal.fire({
-                        icon: "error",
-                        title: "File too large",
-                        text: `${file.name} exceeds 5MB limit`,
-                    });
-                    return false;
-                }
-                return true;
-            });
+        const validFiles = files.filter((file) => {
+            if (file.size > maxSize) {
+                Swal.fire({
+                    icon: "error",
+                    title: "File too large",
+                    text: `${file.name} exceeds 5MB limit`,
+                });
+                return false;
+            }
+            return true;
+        });
 
-            const base64Array = await Promise.all(
-                validFiles.map((file) => {
-                    return new Promise((resolve) => {
-                        const reader = new FileReader();
-                        reader.readAsDataURL(file);
-                        reader.onloadend = () => resolve(reader.result);
-                    });
-                })
-            );
+        setSelectedFiles((prev) => [...prev, ...validFiles]);
 
-            setBase64Images((prev) => [...prev, ...base64Array]);
-        } catch (error) {
-            console.error("Error processing images:", error);
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: "Failed to process images",
-            });
-        }
+        const base64Array = validFiles.map((file) => URL.createObjectURL(file));
+        setBase64Images((prev) => [...prev, ...base64Array]);
     };
 
     const removePayloadImage = (index) => {
@@ -164,6 +124,7 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
 
     const removeBase64Image = (index) => {
         setBase64Images((prev) => prev.filter((_, i) => i !== index));
+        setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
     };
 
     const validateFields = () => {
@@ -171,49 +132,43 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
 
         if (!payload.product_category || payload.product_category.length === 0)
             tempErrors.product_category = "Product Category is required!";
-        
-        if (!payload.product_variant) {
+        if (!payload.product_variant)
             tempErrors.product_variant = "Product Dosage is required!";
-            console.log(tempErrors.product_variant)
-        }
         if (!payload.combination)
             tempErrors.combination = "Product Combination is required!";
         if (!payload.pack_type) tempErrors.pack_type = "Pack Type is required!";
-         if (!payload.stock) tempErrors.stock = "Pack Type is required!";
+        if (!payload.stock) tempErrors.stock = "Stock is required!";
         if (!payload.pack_size) tempErrors.pack_size = "Pack Size is required!";
-        if (!payload.product_mrp || payload.product_mrp <= 0) {
+        if (!payload.product_mrp || payload.product_mrp <= 0)
             tempErrors.product_mrp = "Valid MRP is required!";
-        }
-        if (!payload.franchisee_price || payload.franchisee_price <= 0) {
+        if (!payload.franchisee_price || payload.franchisee_price <= 0)
             tempErrors.franchisee_price = "Valid Franchisee Price is required!";
-        }
-        if (!payload.gst_in_percentage) {
+        if (!payload.gst_in_percentage)
             tempErrors.gst_in_percentage = "GST percentage is required!";
-        }
-        if (!payload.detail_description) {
+        if (!payload.detail_description)
             tempErrors.detail_description = "Product Description is required!";
-        }
-        if (!payload.hsn) {
-            tempErrors.hsn = "HSN Code is required!";
-        }
-        console.log(tempErrors);
+        if (!payload.hsn) tempErrors.hsn = "HSN Code is required!";
+
         setErrors(tempErrors);
         return Object.keys(tempErrors).length === 0;
     };
 
     const handleSubmit = async () => {
-        console.log(payload);
         if (!validateFields()) return;
 
         try {
             setLoading(true);
-            const finalPayload = {
-                ...payload,
-                images: [...payload.images, ...base64Images],
-            };
+
+            const formData = new FormData();
+            Object.keys(payload).forEach((key) => {
+                if (key === "images") return;
+                formData.append(key, payload[key]);
+            });
+
+            selectedFiles.forEach((file) => formData.append("images", file));
 
             if (isEditMode) {
-                await updateProduct(productData._id, finalPayload);
+                await updateProduct(productData._id, formData);
                 Swal.fire({
                     icon: "success",
                     title: "Success",
@@ -223,7 +178,7 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
                     window.location.reload();
                 });
             } else {
-                await addProductForm(finalPayload);
+                await addProductForm(formData);
                 Swal.fire({
                     icon: "success",
                     title: "Success",
@@ -245,18 +200,10 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
     const handleReset = () => {
         setPayload(initialState);
         setBase64Images([]);
+        setSelectedFiles([]);
         setProductTypeOptions([]);
     };
 
-    useEffect(() => {
-        if (productData?.images) {
-            setPayload((prev) => ({ ...prev, images: productData.images }));
-        }
-    }, [productData]);
-
-    console.log(categories)
-
-    // console.log("productData", categories);
     const options =
         categories?.categories?.map((category) => ({
             value: category._id,
@@ -268,196 +215,120 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
             {loading && <PageLoader />}
             <div className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                   
                     <InputField
                         label="Product ID"
-                        name=""
                         value={payload.productId}
                         onChange={(e) =>
-                            setPayload({
-                                ...payload,
-                                productId: e.target.value,
-                            })
+                            setPayload({ ...payload, productId: e.target.value })
                         }
-                        placeholder=""
                         type="text"
                         error={errors.productId && errors.productId}
                     />
                     <div>
-                        <label className="text-sm font-normal">
-                            Select License
-                        </label>
+                        <label className="text-sm font-normal">Select License</label>
                         <select
-                            name=""
-                            id=""
                             className="p-3 border text-xs bg-bg-color1/50 border-gray-300 rounded-md outline-none w-full"
                             value={payload.product_type}
                             onChange={(e) =>
-                                setPayload({
-                                    ...payload,
-                                    product_type: e.target.value,
-                                })
+                                setPayload({ ...payload, product_type: e.target.value })
                             }
                         >
-                            <option value="" selected>
-                                Select License
-                            </option>
+                            <option value="" selected>Select License</option>
                             {producttypeOptions?.map((el) => (
-                                <option key={el._id} value={el._id}>
-                                    {el.name}
-                                </option>
+                                <option key={el._id} value={el._id}>{el.name}</option>
                             ))}
                         </select>
                         {errors.product_type && (
-                            <p className="text-red-500 text-sm">
-                                {errors.product_type}
-                            </p>
+                            <p className="text-red-500 text-sm">{errors.product_type}</p>
                         )}
                     </div>
                     <InputField
                         label="Enter Combination"
-                        name=""
                         value={payload.combination}
                         onChange={(e) =>
-                            setPayload({
-                                ...payload,
-                                combination: e.target.value,
-                            })
+                            setPayload({ ...payload, combination: e.target.value })
                         }
-                        placeholder=""
                         type="text"
                         error={errors.combination && errors.combination}
                     />
                     <div>
-                        <label className="text-sm font-normal">
-                            Select Dosage Form
-                        </label>
+                        <label className="text-sm font-normal">Select Dosage Form</label>
                         <select
-                            name=""
-                            id=""
                             className="p-3 border text-xs bg-bg-color1/50 border-gray-300 rounded-md outline-none w-full"
                             value={payload.product_variant}
                             onChange={(e) =>
-                                setPayload({
-                                    ...payload,
-                                    product_variant: e.target.value,
-                                })
+                                setPayload({ ...payload, product_variant: e.target.value })
                             }
                         >
-                            <option value="" selected>
-                                Select Dosage Form
-                            </option>
+                            <option value="" selected>Select Dosage Form</option>
                             {productVariant?.map((el, i) => (
-                                <option key={i} value={el._id}>
-                                    {el.name}
-                                </option>
+                                <option key={i} value={el._id}>{el.name}</option>
                             ))}
                         </select>
                         {errors.product_variant && (
-                            <p className="text-red-500 text-sm">
-                                {errors.product_variant}
-                            </p>
+                            <p className="text-red-500 text-sm">{errors.product_variant}</p>
                         )}
                     </div>
-
                     <InputField
                         label="Enter Pack Type"
-                        name=""
                         value={payload.pack_type}
                         onChange={(e) =>
-                            setPayload({
-                                ...payload,
-                                pack_type: e.target.value,
-                            })
+                            setPayload({ ...payload, pack_type: e.target.value })
                         }
-                        placeholder=""
                         type="text"
                         error={errors.pack_type && errors.pack_type}
                     />
                     <InputField
                         label="Enter stock"
-                        name=""
                         value={payload.stock}
                         onChange={(e) =>
-                            setPayload({
-                                ...payload,
-                                stock: e.target.value,
-                            })
+                            setPayload({ ...payload, stock: e.target.value })
                         }
-                        placeholder=""
                         type="number"
                         error={errors.stock && errors.stock}
                     />
                     <InputField
                         label="Enter Pack Size"
-                        name=""
                         value={payload.pack_size}
                         onChange={(e) =>
-                            setPayload({
-                                ...payload,
-                                pack_size: e.target.value,
-                            })
+                            setPayload({ ...payload, pack_size: e.target.value })
                         }
-                        placeholder=""
                         type="text"
                         error={errors.pack_size && errors.pack_size}
                     />
                     <InputField
                         label="HSN Code"
-                        name=""
                         value={payload.hsn}
-                        onChange={(e) =>
-                            setPayload({ ...payload, hsn: e.target.value })
-                        }
-                        placeholder=""
+                        onChange={(e) => setPayload({ ...payload, hsn: e.target.value })}
                         type="text"
                         error={errors.hsn && errors.hsn}
                     />
                     <InputField
                         label="GST in Percentage"
-                        name=""
                         value={payload.gst_in_percentage}
                         onChange={(e) =>
-                            setPayload({
-                                ...payload,
-                                gst_in_percentage: e.target.value,
-                            })
+                            setPayload({ ...payload, gst_in_percentage: e.target.value })
                         }
-                        placeholder=""
                         type="number"
-                        error={
-                            errors.gst_in_percentage && errors.gst_in_percentage
-                        }
+                        error={errors.gst_in_percentage && errors.gst_in_percentage}
                     />
                     <InputField
                         label="Product MRP"
-                        name=""
-                        onChange={(e) =>
-                            setPayload({
-                                ...payload,
-                                product_mrp: e.target.value,
-                            })
-                        }
                         value={payload.product_mrp}
-                        placeholder=""
+                        onChange={(e) =>
+                            setPayload({ ...payload, product_mrp: e.target.value })
+                        }
                         type="number"
                         error={errors.product_mrp && errors.product_mrp}
                     />
                     <InputField
                         label="Franchisee Price"
-                        name=""
-                        onChange={(e) =>
-                            setPayload({
-                                ...payload,
-                                franchisee_price: e.target.value,
-                            })
-                        }
                         value={payload.franchisee_price}
-                        placeholder=""
-                        type="number"
-                        error={
-                            errors.franchisee_price && errors.franchisee_price
+                        onChange={(e) =>
+                            setPayload({ ...payload, franchisee_price: e.target.value })
                         }
+                        type="number"
+                        error={errors.franchisee_price && errors.franchisee_price}
                     />
                     <div className="lg:col-span-3 md:col-span-2 col-span-1">
                         <label className="block text-sm font-normal text-gray-700">
@@ -477,76 +348,35 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
                                     fontWeight: 400,
                                     padding: "0.1rem",
                                     boxShadow: "none",
-                                    "&:hover": {
-                                        borderColor: "#d1d5da",
-                                    },
+                                    "&:hover": { borderColor: "#d1d5da" },
                                 }),
                             }}
-                            onChange={(selected) => {
+                            onChange={(selected) =>
                                 setPayload({
                                     ...payload,
-                                    product_category: selected.map(
-                                        (item) => item.value
-                                    ), // Store array of selected values
-                                });
-                            }}
+                                    product_category: selected.map((item) => item.value),
+                                })
+                            }
                         />
                         {errors.product_category && (
-                            <p className="text-red-500 text-sm">
-                                {errors.product_category}
-                            </p>
-                        )}
-                        {payload?.product_category?.length > 0 && (
-                            <div className="mt-2">
-                                <h3 className="text-sm font-semibold">
-                                    Selected Categories:
-                                </h3>
-                                <ul className="list-disc pl-5 flex gap-2 mt-2">
-                                    {payload?.product_category?.map((cat, index) => (
-                                        console.log(cat),
-                                        <li key={index} className="text-sm px-2 py-1 flex items-center gap-2 bg-gray-200 w-fit rounded-md">
-                                            {cat?.name}
-                                            <button
-                                                className="text-red-500 text-base"
-                                                onClick={() => {
-                                                    setPayload((prev) => ({
-                                                        ...prev,
-                                                        product_category: prev.product_category.filter(
-                                                            (item) =>
-                                                                item !== cat
-                                                        ),
-                                                    }));
-                                                }}
-                                            >
-                                                <MdDeleteForever />
-                                            </button>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
+                            <p className="text-red-500 text-sm">{errors.product_category}</p>
                         )}
                     </div>
                 </div>
+
                 <div className="space-y-2">
-                    <label htmlFor="Detailed Description">
-                        Detailed Description
-                    </label>
+                    <label>Detailed Description</label>
                     <ReactQuill
                         theme="snow"
                         value={payload.detail_description}
                         onChange={(value) =>
-                            setPayload({
-                                ...payload,
-                                detail_description: value,
-                            })
+                            setPayload({ ...payload, detail_description: value })
                         }
-                        placeholder="Organize your data in familiar spreadsheets and workbooks..."
+                        placeholder="Organize your data..."
                         className="bg-bg-color1/50 border-gray-300 rounded "
                     />
                     {errors.detail_description && (
-                        <p className="text-red-500 text-sm">
-                            {errors.detail_description}
-                        </p>
+                        <p className="text-red-500 text-sm">{errors.detail_description}</p>
                     )}
                 </div>
 
@@ -595,9 +425,7 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
                         >
                             <div className="text-center">
                                 <IoMdAdd className="mx-auto text-2xl text-gray-400" />
-                                <p className="text-sm text-gray-500">
-                                    Add Images
-                                </p>
+                                <p className="text-sm text-gray-500">Add Images</p>
                             </div>
                         </div>
                     </div>
@@ -616,11 +444,9 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
                 </div>
 
                 <div>
-                    <div className="flex gap-4 mt-20  items-center justify-center">
+                    <div className="flex gap-4 mt-20 items-center justify-center">
                         <Button
-                            title={
-                                isEditMode ? "Update Product" : "Add Product"
-                            }
+                            title={isEditMode ? "Update Product" : "Add Product"}
                             onClick={handleSubmit}
                             disabled={loading}
                         />
