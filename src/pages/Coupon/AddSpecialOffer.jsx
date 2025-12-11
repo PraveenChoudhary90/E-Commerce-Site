@@ -70,7 +70,7 @@ const AddSpecialOffer = () => {
                                             className="w-full border p-2 rounded-md focus:ring-1 focus:ring-blue-300 outline-none"
                                             placeholder="Enter Purchase Amount"
                                         />
-                                        {errors.purchaseAmount && <p className="text-red-500 text-sm">{errors.purchaseAmount.message}</p>}
+                                        {errors.purchaseAmount && <p className="text-red-500 text-sm">{errors.purchaseAmount?.message}</p>}
                                     </div>
 
                                     <div>

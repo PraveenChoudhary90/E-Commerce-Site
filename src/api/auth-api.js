@@ -50,7 +50,7 @@ export async function deleteMember(id) {
 }
 
 export async function getSellerListToVerify() {
-  const response = await Axios.get(`${apiUrl}/get-seller-list-to-verify`);
+  const response = await Axios.get('/auth/get-seller-list-to-verify');
   return response?.data;
 }
 
@@ -78,15 +78,28 @@ export async function deleteCoupon(id) {
   return response?.data;
 }
 
+// export async function updateVendorStatus(id, status, reason = "") {
+//   const response = await Axios.put('/auth/update-vendor-status/${id}/${status}', { reason } );
+//   return response?.data;
+// } 
 export async function updateVendorStatus(id, status, reason = "") {
-  const response = await Axios.put(`${apiUrl}/update-vendor-status/${id}/${status}`, { reason } );
-  return response?.data;
-} 
-
-export async function switchVendorToPromoter(id) {
-  const response = await Axios.put(`${apiUrl}/switch-vendor-to-promoter/${id}`);
+  const response = await Axios.put(
+    `/auth/update-vendor-status/${id}/${status}`,
+    { reason }
+  );
   return response?.data;
 }
+
+
+// export async function switchVendorToPromoter(id) {
+//   const response = await Axios.put(`switch-vendor-to-promoter/${id}`);
+//   return response?.data;
+// }
+export async function switchVendorToPromoter(id) {
+  const response = await Axios.put(`/auth/switch-vendor-to-promoter/${id}`);
+  return response?.data;
+}
+
 
 export async function rewardManagement(payload) {
   const response = await Axios.post(`${apiUrl}/create-reward`, payload);

@@ -163,7 +163,7 @@ const VendorManagementForm = () => {
                     {/* general details section  */}
                     <Section title="General Details">
                         <InputField
-                            disabled
+                           
                             label="Franchisee Name*"
                             name="vendorName"
                             value={formData.vendorName}

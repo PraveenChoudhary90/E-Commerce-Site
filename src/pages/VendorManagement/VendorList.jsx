@@ -242,26 +242,27 @@ const navigate = useNavigate()
                                                       1}
                                               </td>
                                               <td className="border border-gray-300 p-2 font-light text-start capitalize">
-                                                  {item.name?.username}
+                                                  {item.vendorName}
+                                                  {console.log(item)}
                                               </td>
                                               <td className="border border-gray-300 p-2 font-light text-center">
                                                   {item._id}
                                               </td>
                                               <td className="border border-gray-300 p-2 font-light text-center capitalize">
-                                                  {item.shopdetails?.shopname}
+                                                  {item.companyName}
                                               </td>
                                               <td
                                                   className={`border border-gray-300 p-2 text-center capitalize ${
-                                                      item.isVendorVerified ===
+                                                      item.kycStatus ===
                                                       "pending"
                                                           ? "text-yellow-500"
-                                                          : item.VerificationStatus ===
+                                                          : item.kycStatus ===
                                                         "approved"
                                                         ? "text-red-500"
                                                         : "text-green-500"
                                                   }`}
                                               >
-                                                  {item.isVendorVerified}
+                                                  {item.kycStatus}
                                               </td>
 
                                               <td

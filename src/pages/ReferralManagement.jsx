@@ -20,6 +20,7 @@ export default function ReferralManagement() {
       try {
         setLoading(true);
         const response = await getReferralPercentages();
+        console.log("xbzxbj",response)
         if (response) {
           setLevels(response.percentages);
           const fetchedMax = Math.max(
@@ -55,6 +56,7 @@ export default function ReferralManagement() {
     try {
       setLoading(true);
       const response = await referralManagement(levels);
+      console.log("dfnbj",response)
       if (response) {
         Swal.fire({
           icon: "success",

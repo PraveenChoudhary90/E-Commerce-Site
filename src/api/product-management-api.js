@@ -166,3 +166,35 @@ export async function softHideProduct(id) {
   const response = await Axios.put(`${apiUrl}/soft-hide-product/${id}`);
   return response?.data;
 }
+
+
+export const createAttribute = async (payload) => {
+  const response = await Axios.post(`${apiUrl}/create-attribute`, payload);
+  return response?.data;
+};
+
+export const getAllAttributes = async () => {
+  const response = await Axios.get(`${apiUrl}/get-attribute`);
+  return response?.data;
+};
+
+export const getAttributeById = async (id) => {
+  const response = await Axios.get(`${apiUrl}/${id}`);
+  return response?.data;
+};
+
+export const updateAttribute = async (id, payload) => {
+  const response = await Axios.put(`${apiUrl}/${id}`, payload);
+  return response?.data;
+};
+
+export const deleteAttribute = async (id) => {
+  const response = await Axios.delete(`${apiUrl}/${id}`);
+  return response?.data;
+};
+
+// optional
+export const getAttributeTree = async () => {
+  const response = await Axios.get(`${apiUrl}?tree=true`);
+  return response?.data;
+};

@@ -24,6 +24,7 @@ export const Routers = {
   VendorDetails: "/franchisee-details/:id",
   NotFound: "*",
   PRODUCT_MANAGEMENT: "/product-list",
+  // CATEGORY_MANAGMENT:"/category-list",
   AddProductManagement: "/add-product-management",
   INVENTORY_MANAGEMENT: "/inventory-management",
   CONTENT_MANAGEMENT: "/content-management",

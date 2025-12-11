@@ -19,9 +19,10 @@ const MarketingTool = () => {
             try {
                 const response = await fetchPromotion();
                 if (response) {
-                    setVideoPromotions(response.filter((item) => item.type === "video"));
-                    setImagePromotions(response.filter((item) => item.type === "image"));
-                    setPdfs(response.filter((item) => item.type === "pdf"));
+                    console.log(response?.data)
+                    setVideoPromotions(response?.data.filter((item) => item.type === "video"));
+                    setImagePromotions(response?.data.filter((item) => item.type === "image"));
+                    setPdfs(response?.data.filter((item) => item.type === "pdf"));
                 }
             } catch (error) {
                 console.error("Error fetching promotions:", error);

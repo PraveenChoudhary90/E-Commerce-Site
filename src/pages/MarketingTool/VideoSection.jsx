@@ -102,7 +102,7 @@ const VideoSection = ({ videos, setVideoPromotions }) => {
                                 <video
                                     ref={(el) => (videoRefs.current[index] = el)}
                                     className="w-full h-full object-cover"
-                                    src={vid.link}
+                                    src={vid.file}
                                     controls={false}
                                     loop
                                     muted

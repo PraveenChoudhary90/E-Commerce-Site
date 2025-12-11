@@ -19,7 +19,7 @@ const AllGetPdf = () => {
             try {
                 const response = await fetchPromotion();
                 if (response) {
-                    const filteredPdfs = response.filter((item) => item.type === "pdf");
+                    const filteredPdfs = response?.data.filter((item) => item.type === "pdf");
                     setPdfs(filteredPdfs);
                 }
             } catch (error) {
@@ -47,7 +47,7 @@ const AllGetPdf = () => {
             setLoading(true);
             try {
                 await deletePromotion(id);
-                setPdfs((prev) => prev.filter((item) => item._id !== id));
+                setPdfs((prev) => prev?.data.filter((item) => item._id !== id));
                 Swal.fire({
                     icon: "success",
                     title: "Deleted!",

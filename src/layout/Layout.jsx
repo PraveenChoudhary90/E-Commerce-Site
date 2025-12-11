@@ -59,6 +59,11 @@ const Layout = () => {
             label: "All Product List",
             icon: <BiSolidShoppingBags />,
         },
+        // {
+        //     path: Routers.CATEGORY_MANAGMENT,
+        //     label: "All Category List",
+        //     icon: <BiSolidShoppingBags />,
+        // },
         {
             path: Routers.INVENTORY_MANAGEMENT,
             label: "Inventory Report",

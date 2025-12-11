@@ -1,169 +1,210 @@
 import React, { useEffect, useState } from "react";
-import SelectComponent from "../../components/SelectComponent";
 import Select from "react-select";
-import InputField from "../../components/InputField";
-import { getAllProductList } from "../../api/product-management-api";
 import PageLoader from "../../components/ui/PageLoader";
-import Swal from "sweetalert2"; // Import SweetAlert
+import Swal from "sweetalert2";
+
+import { getAllProductList } from "../../api/product-management-api";
 import { createPromotion } from "../../api/auth-api";
 
-import { imageBase64Convertor } from "../../utils/additionalFunction";
-
 const MarketingForm = () => {
-    const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({
+    type: "",
+    file: null,
+    productId: "",
+  });
+
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  // validate form
+  useEffect(() => {
+    const valid =
+      Boolean(formData.productId) &&
+      Boolean(formData.type) &&
+      Boolean(formData.file);
+
+    setIsFormValid(valid);
+
+    console.log("FORM DATA:", formData);
+    console.log("IS VALID:", valid);
+  }, [formData]);
+
+  // load products
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const list = await getAllProductList();
+        // list should be array of Product docs
+        setProducts(list);
+      } catch (error) {
+        console.error("Error fetching product list:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0] || null;
+    setFormData((prev) => ({
+      ...prev,
+      file,
+    }));
+  };
+
+  const handleTypeChange = (e) => {
+    const value = e.target.value;
+    setFormData((prev) => ({
+      ...prev,
+      type: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    console.log("SUBMIT CLICKED", { isFormValid, formData });
+
+    if (!isFormValid) {
+      Swal.fire("Validation", "Please fill all fields and select a file.", "warning");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const fd = new FormData();
+      fd.append("type", formData.type);
+      fd.append("productId", formData.productId);
+      fd.append("file", formData.file);
+
+      const response = await createPromotion(fd);
+      console.log("createPromotion response:", response);
+
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "Form submitted successfully!",
+      }).then(() => {
+        window.location.reload();
+      });
+
+      setFormData({
         type: "",
         file: null,
-        productName: "",
-    });
+        productId: "",
+      });
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error?.response?.data?.message || "Failed to submit form. Please try again.",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [submitting, setSubmitting] = useState(false);
-    const [isFormValid, setIsFormValid] = useState(false);
-    const [base64File, setBase64File] = useState("");
-    const [previewImg, setPreviewImg] = useState("");
+  
+  const productOptions = products.map((item) => ({
+    value: item._id,
+    label: `${item.productId || ""} `.trim(),
+  }));
 
-    useEffect(() => {
-        setIsFormValid(formData.productName && formData.type && base64File);
-    }, [formData, base64File]);
+  const selectedProductOption =
+    productOptions.find((opt) => opt.value === formData.productId) || null;
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            try {
-                const list = await getAllProductList();
-                setData(list.map((item) => item.brand).sort((a, b) => a.localeCompare(b)));
-            } catch (error) {
-                console.error("Error fetching product list:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+  if (loading || submitting) {
+    return <PageLoader />;
+  }
 
-        fetchData();
-    }, []);
+  return (
+    <div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
+          {/* Product Select */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Select Product
+            </label>
+            <Select
+              name="productId"
+              value={selectedProductOption}
+              onChange={(selectedOption) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  productId: selectedOption?.value || "",
+                }))
+              }
+              options={productOptions}
+              placeholder="Choose a product"
+              isSearchable
+            />
+          </div>
 
+          {/* Media type */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Select Media Type
+            </label>
+            <select
+              name="type"
+              value={formData.type}
+              onChange={handleTypeChange}
+              className="w-full border rounded-md px-3 py-2"
+            >
+              <option value="">Choose an option</option>
+              <option value="image">Image</option>
+              <option value="video">Video</option>
+              <option value="pdf">PDF</option>
+            </select>
+          </div>
 
-
-    const handleChange = (e) => {
-        const { name, value, type } = e.target;
-        if (type === "file") {
-            imageBase64Convertor(e, setBase64File, setPreviewImg);
-            setFormData((prevData) => ({ ...prevData, file: e.target.files[0] }));
-        } else {
-            setFormData((prevData) => ({ ...prevData, [name]: value }));
-        }
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setSubmitting(true);
-        try {
-            const payload = { ...formData, file: base64File };
-            const response = await createPromotion(payload);
-
-            if (response) {
-                Swal.fire({
-                    icon: "success",
-                    title: "Success!",
-                    text: "Form submitted successfully!",
-                }).then(() => {
-                    window.location.reload();
-                });
-                setFormData({ type: "", file: null, productName: "" });
-                setBase64File("");
-                setPreviewImg("");
-            } else {
-                Swal.fire({
-                    icon: "error",
-                    title: "Submission Failed",
-                    text: response?.message || "Something went wrong. Please try again.",
-                });
-            }
-        } catch (error) {
-            console.error("Error submitting form:", error);
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: "Failed to submit form. Please try again.",
-            });
-        }
-        finally {
-            setSubmitting(false);
-        }
-    };
-
-
-    return (
-        <div>
-            {(loading || submitting) ? (
-                <PageLoader />
-            ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
-                            {/* <SelectComponent
-                            label="Select Product Name"
-                            name="productName"
-                            value={formData.productName}
-                            onChange={handleChange}
-                            options={data.map((item) => ({ value: item, label: item }))}
-                            placeholder="Choose an option"
-                        /> */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Select Product Name
-                                </label>
-                                <Select
-                                    name="productName"
-                                    value={formData.productName}
-                                    onChange={(selectedOption) =>
-                                        handleChange({ target: { name: "productName", value: selectedOption.value } })
-                                    }
-                                    options={data.map((item) => ({ value: item, label: item }))}
-                                    placeholder="Choose an option"
-                                    isSearchable
-                                />
-                            </div>
-
-                        <SelectComponent
-                            label="Select Media Type"
-                            name="type"
-                            value={formData.type}
-                            onChange={handleChange}
-                            options={[
-                                { value: "image", label: "Image" },
-                                { value: "video", label: "Video" },
-                                { value: "pdf", label: "PDF" },
-                            ]}
-                            placeholder="Choose an option"
-                        />
-
-                        {formData.type && (
-                            <InputField
-                                label={`Upload ${formData.type}`}
-                                name="file"
-                                type="file"
-                                onChange={handleChange}
-                            />
-                        )}
-                    </div>
-
-                    <div className="">
-                        <button
-                            type="submit"
-                            className={`w-full py-2 px-4 rounded-md transition ${isFormValid
-                                    ? "bg-bg-color text-white"
-                                    : "bg-gray-400 cursor-not-allowed"
-                                }`}
-                            disabled={!isFormValid}
-                        >
-                            {submitting ? "Submitting..." : "Submit"}
-                        </button>
-                    </div>
-                </form>
-            )}
+          {/* File upload */}
+          {formData.type && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Upload {formData.type}
+              </label>
+              <input
+                type="file"
+                name="file"
+                onChange={handleFileChange}
+                className="w-full"
+                accept={
+                  formData.type === "image"
+                    ? "image/*"
+                    : formData.type === "video"
+                    ? "video/*"
+                    : formData.type === "pdf"
+                    ? "application/pdf"
+                    : "*/*"
+                }
+              />
+            </div>
+          )}
         </div>
-    );
+
+        <div>
+          <button
+            type="submit"
+            className={`w-full py-2 px-4 rounded-md transition ${
+              isFormValid
+                ? "bg-bg-color text-white cursor-pointer"
+                : "bg-gray-400 cursor-not-allowed"
+            }`}
+          >
+            {submitting ? "Submitting..." : "Submit"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
 };
 
 export default MarketingForm;

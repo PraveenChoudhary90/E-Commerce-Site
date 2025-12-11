@@ -112,8 +112,10 @@ const ImageSection = ({ images, setImagePromotions }) => {
                                             </div>
                                         </div>
                                         <div className="w-full h-60 rounded-lg overflow-hidden">
+                                           
                                             <img
-                                                src={item.link}
+
+                                                src={item.file}
                                                 alt={`Product ${index + 1}`}
                                                 className="w-full h-full object-cover"
                                             />

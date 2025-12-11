@@ -36,6 +36,8 @@ import OfferManagement from "./pages/Coupon/OfferManagement";
 import StaticBanner from "./pages/StaticBanner/StaticBanner";
 import ReferralManagement from "./pages/ReferralManagement";
 import GalleryManagement from "./pages/GalleryManagement/GalleryManagement";
+// import CategoryList from "./pages/AddProductManagement/CategoryList";
+//import CategoryList from "./pages/AddProductManagement/CategoryList";
 
 
 const RoutersPages = () => {
@@ -89,11 +91,12 @@ const RoutersPages = () => {
                 element={<InventoryManagement />}
               />
               <Route path={Routers.ProductList} element={<ProductList />} />
+              {/* <Route path={Routers.CATEGORY_MANAGMENT} element={<CategoryList />} /> */}
               {/* <Route path={Routers.CheckOut} element={<CheckoutPage />} /> */}
               <Route path={Routers.ManageMembers} element={<ManageMembers />} />
               <Route path={Routers.MembersProfile} element={<MemberProfile />} />
               <Route path={Routers.AddProduct} element={<AddProduct />} />
-              <Route path={Routers.AddCategories} element={<AddCategories />} />
+               <Route path={Routers.AddCategories} element={<AddCategories />} /> 
               <Route path={Routers.AddCategoryType} element={<AddCategoryTypes />} />
               <Route path={Routers.AddCategoryBrand} element={<AddCategoryBrand />} />
               <Route path={Routers.VendorManagement} element={<VendorManagement />} />
