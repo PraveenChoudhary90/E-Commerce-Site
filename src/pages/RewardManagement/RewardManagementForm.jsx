@@ -50,9 +50,9 @@ export default function RewardManagementForm() {
 
 
       // Filter rewards by type
-      setReferralRewards(data.filter(reward => reward.rewardType === "referral"));
-      setRepetitivePurchaseRewards(data.filter(reward => reward.rewardType === "repetitivePurchase"));
-      setSpecialRewards(data.filter(reward => reward.rewardType === "specialReward"));
+      setReferralRewards(data?.data.filter(reward => reward.rewardType === "referral"));
+      setRepetitivePurchaseRewards(data?.data.filter(reward => reward.rewardType === "repetitivePurchase"));
+      setSpecialRewards(data?.data.filter(reward => reward.rewardType === "specialReward"));
     } catch (err) {
       console.error("Error fetching rewards:", err);
       setError("Failed to load rewards. Please try again.");

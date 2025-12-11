@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { deleteCoupon, getAllValidCoupons, updateCoupon } from "../../api/auth-api";
-import Button from "../../components/Button";
 import PageLoader from "../../components/ui/PageLoader";
 import { MdModeEdit } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
@@ -22,63 +21,80 @@ const Coupon = () => {
     formState: { errors },
   } = useForm();
 
+  
   useEffect(() => {
     const getCoupons = async () => {
       try {
         setLoading(true);
-        const allCoupons = await getAllValidCoupons();
-        setCouponData(allCoupons?.coupons || []);
+        setError(null);
+
+        
+        const res = await getAllValidCoupons();
+        
+        const coupons = res?.data|| [];
+
+        setCouponData(coupons);
+        console.log("Coupons from API:", coupons);
       } catch (err) {
+        console.error("Failed to fetch coupons:", err);
         setError("Failed to fetch coupons");
       } finally {
         setLoading(false);
       }
     };
+
     getCoupons();
   }, []);
+
+  
   const handleEditClick = (coupon) => {
     setSelectedCoupon(coupon);
     setShowCouponForm(true);
 
-    // Pre-fill form fields
+    
     setValue("couponCode", coupon.couponCode);
     setValue("discount", coupon.discount);
-    setValue("validFrom", coupon.validFrom.split("T")[0]);
-    setValue("validTill", coupon.validTill.split("T")[0]);
+    if (coupon.validFrom) setValue("validFrom", coupon.validFrom.split("T")[0]);
+    if (coupon.validTill) setValue("validTill", coupon.validTill.split("T")[0]);
   };
-  console.log(selectedCoupon, "selectedCoupon");
-
 
   const onSubmit = async (data) => {
-    if (selectedCoupon) {
-      try {
-        setLoading(true);
-        await updateCoupon(selectedCoupon._id, data);
+    if (!selectedCoupon) return;
 
-        Swal.fire({
-          icon: "success",
-          title: "Coupon Updated",
-          text: "The coupon has been successfully updated!",
-          confirmButtonColor: "#6366F1", // Change this to match your theme
-        }).then(() => {
-          window.location.reload()
-        });
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Update Failed",
-          text: "Failed to update coupon. Please try again.",
-          confirmButtonColor: "#EF4444",
-        });
-      } finally {
-        setLoading(false);
+    try {
+      setLoading(true);
+      await updateCoupon(selectedCoupon._id, data);
+
+      Swal.fire({
+        icon: "success",
+        title: "Coupon Updated",
+        text: "The coupon has been successfully updated!",
+        confirmButtonColor: "#6366F1",
+      }).then(() => {
+        
+        setCouponData((prev) =>
+          prev.map((c) =>
+            c._id === selectedCoupon._id ? { ...c, ...data } : c
+          )
+        );
         setShowCouponForm(false);
         setSelectedCoupon(null);
-      }
+        reset();
+      });
+    } catch (error) {
+      console.error("Update failed:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Update Failed",
+        text: "Failed to update coupon. Please try again.",
+        confirmButtonColor: "#EF4444",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
-
+  
   const handleDeleteClick = async (id) => {
     Swal.fire({
       title: "Are you sure?",
@@ -89,29 +105,30 @@ const Coupon = () => {
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Yes, delete it!",
     }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await deleteCoupon(id);
-          setCouponData((prev) => prev.filter((coupon) => coupon._id !== id));
-          Swal.fire({
-            title: "Deleted!",
-            text: "Coupon has been deleted.",
-            icon: "success",
-            confirmButtonColor: "#6366F1",
-          });
-        } catch (error) {
-          Swal.fire({
-            title: "Failed!",
-            text: "Could not delete coupon. Please try again.",
-            icon: "error",
-            confirmButtonColor: "#EF4444",
-          });
-        }
+      if (!result.isConfirmed) return;
+
+      try {
+        await deleteCoupon(id);
+        setCouponData((prev) => prev.filter((coupon) => coupon._id !== id));
+        Swal.fire({
+          title: "Deleted!",
+          text: "Coupon has been deleted.",
+          icon: "success",
+          confirmButtonColor: "#6366F1",
+        });
+      } catch (error) {
+        console.error("Delete failed:", error);
+        Swal.fire({
+          title: "Failed!",
+          text: "Could not delete coupon. Please try again.",
+          icon: "error",
+          confirmButtonColor: "#EF4444",
+        });
       }
     });
   };
 
-
+ 
   return (
     <div>
       {loading && <PageLoader />}
@@ -121,28 +138,62 @@ const Coupon = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {couponData.length > 0 ? (
             couponData.map((coupon) => (
-              <div key={coupon.id} className="bg-white rounded-lg p-4 relative border-l-4 border-bg-color shadow-md">
+              <div
+                key={coupon._id} 
+                className="bg-white rounded-lg p-4 relative border-l-4 border-bg-color shadow-md"
+              >
                 <div className="w-full flex items-center justify-between gap-2 py-2">
-                  <h3 className="text-xl font-semibold">{coupon.couponCode}</h3>
-                  {/* <h3 className="text-xl font-semibold">{coupon._id}</h3> */}
+                  <div>
+                    <h3 className="text-xl font-semibold">
+                      {coupon.schemeName}
+                    </h3>
+                    <p className="text-xs text-gray-500">
+                      Code:{" "}
+                      <span className="font-semibold">
+                        {coupon.couponCode}
+                      </span>
+                    </p>
+                  </div>
 
                   <div className="flex gap-2 items-center justify-center text-sm">
-                    <button className="p-1 rounded text-bg-color bg-bg-color/10" onClick={() => handleEditClick(coupon)}>
+                    <button
+                      className="p-1 rounded text-bg-color bg-bg-color/10"
+                      onClick={() => handleEditClick(coupon)}
+                    >
                       <MdModeEdit />
                     </button>
-                    <button className="p-1 rounded text-bg-color bg-bg-color/10" onClick={() => handleDeleteClick(coupon._id)}>
+                    <button
+                      className="p-1 rounded text-bg-color bg-bg-color/10"
+                      onClick={() => handleDeleteClick(coupon._id)}
+                    >
                       <RiDeleteBin6Line />
                     </button>
                   </div>
                 </div>
+
                 <p className="text-gray-600 text-sm">
-                  Get <span className="font-bold text-green-600">{coupon.discount}% OFF</span>
+                  Get{" "}
+                  <span className="font-bold text-green-600">
+                    {coupon.discount}% OFF
+                  </span>
                 </p>
+
                 <p className="text-gray-500 text-sm mt-2">
-                  Valid from: <span className="font-semibold">{new Date(coupon.validFrom).toLocaleDateString()}</span>
+                  Valid from:{" "}
+                  <span className="font-semibold">
+                    {coupon.validFrom
+                      ? new Date(coupon.validFrom).toLocaleDateString()
+                      : "-"}
+                  </span>
                 </p>
+
                 <p className="text-gray-500 text-sm">
-                  Valid till: <span className="font-semibold">{new Date(coupon.validTill).toLocaleDateString()}</span>
+                  Valid till:{" "}
+                  <span className="font-semibold">
+                    {coupon.validTill
+                      ? new Date(coupon.validTill).toLocaleDateString()
+                      : "-"}
+                  </span>
                 </p>
               </div>
             ))
@@ -159,19 +210,33 @@ const Coupon = () => {
               <h2 className="text-2xl font-bold mb-4 text-center">
                 {selectedCoupon ? "Edit Coupon" : "Create Coupon"}
               </h2>
-              <button className="text-4xl text-red-400" onClick={() => setShowCouponForm(false)}>
+              <button
+                className="text-4xl text-red-400"
+                onClick={() => {
+                  setShowCouponForm(false);
+                  setSelectedCoupon(null);
+                  reset();
+                }}
+              >
                 &times;
               </button>
             </div>
+
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
                 <label className="block font-medium">Coupon Code</label>
                 <input
                   type="text"
-                  {...register("couponCode", { required: "Coupon code is required" })}
+                  {...register("couponCode", {
+                    required: "Coupon code is required",
+                  })}
                   className="w-full border p-2 rounded-md focus:ring-1 focus:ring-blue-300 outline-none"
                 />
-                {errors.couponCode && <p className="text-red-500 text-sm">{errors.couponCode.message}</p>}
+                {errors.couponCode && (
+                  <p className="text-red-500 text-sm">
+                    {errors.couponCode.message}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -185,27 +250,43 @@ const Coupon = () => {
                   })}
                   className="w-full border p-2 rounded-md focus:ring-1 focus:ring-blue-300 outline-none"
                 />
-                {errors.discount && <p className="text-red-500 text-sm">{errors.discount.message}</p>}
+                {errors.discount && (
+                  <p className="text-red-500 text-sm">
+                    {errors.discount.message}
+                  </p>
+                )}
               </div>
 
               <div>
                 <label className="block font-medium">Valid From</label>
                 <input
                   type="date"
-                  {...register("validFrom", { required: "Start date is required" })}
+                  {...register("validFrom", {
+                    required: "Start date is required",
+                  })}
                   className="w-full border p-2 rounded-md focus:ring-1 focus:ring-blue-300 outline-none"
                 />
-                {errors.validFrom && <p className="text-red-500 text-sm">{errors.validFrom.message}</p>}
+                {errors.validFrom && (
+                  <p className="text-red-500 text-sm">
+                    {errors.validFrom.message}
+                  </p>
+                )}
               </div>
 
               <div>
                 <label className="block font-medium">Valid Till</label>
                 <input
                   type="date"
-                  {...register("validTill", { required: "End date is required" })}
+                  {...register("validTill", {
+                    required: "End date is required",
+                  })}
                   className="w-full border p-2 rounded-md focus:ring-1 focus:ring-blue-300 outline-none"
                 />
-                {errors.validTill && <p className="text-red-500 text-sm">{errors.validTill.message}</p>}
+                {errors.validTill && (
+                  <p className="text-red-500 text-sm">
+                    {errors.validTill.message}
+                  </p>
+                )}
               </div>
 
               <button

@@ -22,7 +22,7 @@ const AllGetImages = () => {
             try {
                 const response = await fetchPromotion();
                 if (response) {
-                    const filteredImages = response.filter((item) => item.type === "image");
+                    const filteredImages = response?.data.filter((item) => item.type === "image");
                     setImagePromotions(filteredImages);
                 }
             } catch (error) {
@@ -64,7 +64,7 @@ const AllGetImages = () => {
             setLoading(true); 
             try {
                 await deletePromotion(id);
-                setImagePromotions((prev) => prev.filter((item) => item._id !== id));
+                setImagePromotions((prev) => prev?.data.filter((item) => item._id !== id));
                 Swal.fire({
                     icon: "success",
                     title: "Deleted!",
@@ -126,7 +126,7 @@ const AllGetImages = () => {
                                         </div>
                                         <div className="w-full h-60 rounded-lg overflow-hidden">
                                             <img
-                                                src={item.link}
+                                                src={item.file}
                                                 alt={`Product ${index + 1}`}
                                                 className="w-full h-full object-cover"
                                             />

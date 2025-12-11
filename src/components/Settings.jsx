@@ -138,12 +138,13 @@ export default function SettingsForm() {
 
                 {/* Save Button */}
                 <button
-                    type="submit"
-                    onClick={() => handleSubmit}
-                    className="bg-purple-700 text-white font-bold rounded-lg px-6 py-2 shadow hover:bg-purple-800"
-                >
-                    SAVE
-                </button>
+  type="submit"
+  onClick={handleSubmit}
+  className="bg-purple-700 text-white font-bold rounded-lg px-6 py-2 shadow hover:bg-purple-800"
+>
+  SAVE
+</button>
+
             </div>
         </div>
     );

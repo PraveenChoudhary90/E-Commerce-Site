@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { addBanner, getDetails, updateBanner } from "../../api/product-management-api";
 import Swal from "sweetalert2";
 import PageLoader from "../../components/ui/PageLoader";
 import { addEvent, updateEvent } from "../../api/auth-api";
@@ -8,17 +7,17 @@ const EditBanner = ({ title, bannerData, onClick, editmode = false }) => {
   const [banner, setBanner] = useState({
     title: "",
     description: "",
-    images: [],
+    images: [], // can be: existing URLs (string) + new File objects
   });
   const [loading, setLoading] = useState(false);
 
+  // Load existing event for edit mode
   useEffect(() => {
     if (bannerData) {
       setBanner({
-        ...bannerData,
         title: bannerData.title || "",
         description: bannerData.description || "",
-        images: bannerData.images || [],
+        images: bannerData.images || [], // these should be ImageKit URLs from backend
       });
     }
   }, [bannerData]);
@@ -30,42 +29,62 @@ const EditBanner = ({ title, bannerData, onClick, editmode = false }) => {
     }));
   };
 
-  const handleImageUpload = async (event) => {
+  // ✅ Use File objects instead of base64
+  const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
-
-    const base64Images = await Promise.all(
-      files.map(
-        (file) =>
-          new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onloadend = () => resolve(reader.result);
-          })
-      )
-    );
 
     setBanner((prevBanner) => ({
       ...prevBanner,
-      images: [...prevBanner.images, ...base64Images],
+      images: [...prevBanner.images, ...files], // File objects
+    }));
+  };
+
+  // Show correct preview for URL vs File
+  const getImageSrc = (img) => {
+    if (img instanceof File) {
+      return URL.createObjectURL(img);
+    }
+    return img; // assume URL string
+  };
+
+  const removeImage = (imageIndex) => {
+    setBanner((prevBanner) => ({
+      ...prevBanner,
+      images: prevBanner.images.filter((_, index) => index !== imageIndex),
     }));
   };
 
   const handleBannerSave = async () => {
     try {
       setLoading(true);
+
+      // Build FormData for multer
+      const formData = new FormData();
+      formData.append("title", banner.title);
+      formData.append("description", banner.description);
+
+      // For simplicity: send ONLY new File images; existing URLs are kept in DB
+      banner.images.forEach((img) => {
+        if (img instanceof File) {
+          formData.append("images", img);
+        }
+      });
+
       if (bannerData) {
-        await updateEvent(bannerData._id, banner);
+        // UPDATE
+        await updateEvent(bannerData._id, formData);
         Swal.fire({
           icon: "success",
           title: "Event updated!",
-          text: "Event updated Successfully",
+          text: "Event updated successfully",
         }).then(() => window.location.reload());
       } else {
-        await addEvent(banner); // API may expect array
+        // CREATE
+        await addEvent(formData);
         Swal.fire({
           icon: "success",
           title: "Event saved!",
-          text: "New Event added Successfully",
+          text: "New Event added successfully",
         }).then(() => window.location.reload());
       }
     } catch (error) {
@@ -78,13 +97,6 @@ const EditBanner = ({ title, bannerData, onClick, editmode = false }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const removeImage = (imageIndex) => {
-    setBanner((prevBanner) => ({
-      ...prevBanner,
-      images: prevBanner.images.filter((_, index) => index !== imageIndex),
-    }));
   };
 
   return (
@@ -106,13 +118,14 @@ const EditBanner = ({ title, bannerData, onClick, editmode = false }) => {
         </div>
 
         <div className="grid gap-5 md:grid-cols-2 grid-cols-1 md:grid-flow-row grid-flow-row-dense">
+          {/* PREVIEW AREA */}
           <div className="order-2 md:order-1 bg-white rounded-lg border overflow-hidden">
             {banner.images.length > 0 && (
               <div className="flex flex-wrap gap-2 p-2">
                 {banner.images.map((img, index) => (
                   <div key={index} className="relative">
                     <img
-                      src={img}
+                      src={getImageSrc(img)}
                       alt="Banner Preview"
                       className="w-24 h-24 object-cover rounded-md"
                     />
@@ -128,30 +141,46 @@ const EditBanner = ({ title, bannerData, onClick, editmode = false }) => {
             )}
           </div>
 
+          {/* FORM AREA */}
           <div className="order-1 md:order-2 p-4 bg-white space-y-5">
-            <h3 className="text-lg font-medium">{banner.title} Image & Direction</h3>
+            <h3 className="text-lg font-medium">
+              {banner.title || "Event"} Image & Direction
+            </h3>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Event Title</label>
+                <label className="block text-sm font-medium mb-2">
+                  Event Title
+                </label>
                 <input
                   type="text"
                   value={banner.title}
                   className="w-full px-4 py-2 border rounded-md"
-                  onChange={(e) => handleInputChange("title", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("title", e.target.value)
+                  }
                 />
               </div>
+
               <div>
-                <label className="block text-sm font-medium mb-2">Description</label>
+                <label className="block text-sm font-medium mb-2">
+                  Description
+                </label>
                 <input
                   type="text"
                   value={banner.description}
                   className="w-full px-4 py-2 border rounded-md"
-                  onChange={(e) => handleInputChange("description", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
                 />
               </div>
+
               <div>
-                <label className="block text-sm font-medium mb-2">Select Images <span className="text-xs opacity-70">(Size 1024x1024)</span></label>
+                <label className="block text-sm font-medium mb-2">
+                  Select Images{" "}
+                  <span className="text-xs opacity-70">(Size 1024x1024)</span>
+                </label>
                 <input
                   type="file"
                   multiple

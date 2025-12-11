@@ -24,7 +24,7 @@ const AllGetVideos = () => {
             try {
                 const response = await fetchPromotion();
                 if (response) {
-                    const filteredImages = response.filter((item) => item.type === "video");
+                    const filteredImages = response?.data.filter((item) => item.type === "video");
                     setImagePromotions(filteredImages);
                 }
             } catch (error) {
@@ -86,7 +86,7 @@ const AllGetVideos = () => {
             setLoading(true);
             try {
                 await deletePromotion(id);
-                setImagePromotions((prev) => prev.filter((item) => item._id !== id));
+                setImagePromotions((prev) => prev?.data.filter((item) => item._id !== id));
                 Swal.fire({
                     icon: "success",
                     title: "Deleted!",
@@ -127,9 +127,12 @@ const AllGetVideos = () => {
                                 <div className="flex flex-col gap-2">
                                     <div key={index} className="w-full h-80 md:h-96 relative border overflow-hidden rounded-xl group">
                                         <video
+                                      
+                                        
                                             ref={(el) => (videoRefs.current[index] = el)}
+                                            
                                             className="w-full h-full object-cover"
-                                            src={vid.link}
+                                            src={vid.file}
                                             controls={false}
                                             loop
                                             muted
@@ -166,7 +169,7 @@ const AllGetVideos = () => {
                                                     </button>
                                                     <button
                                                         className="p-1 rounded text-bg-color bg-bg-color1"
-                                                        onClick={() => handleDownload(vid.link, index)}
+                                                        onClick={() => handleDownload(vid.file, index)}
                                                     >
                                                         <MdOutlineFileDownload />
                                                     </button>
