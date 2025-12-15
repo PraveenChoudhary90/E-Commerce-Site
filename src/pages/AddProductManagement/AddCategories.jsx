@@ -1,4 +1,4 @@
-// src/pages/category/CategoryManager.jsx
+
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import PageLoader from "../../components/ui/PageLoader";
@@ -6,18 +6,16 @@ import Button from "../../components/Button";
 import InputField from "../../components/InputField";
 import { FaPlus, FaTrash, FaEdit } from "react-icons/fa";
 
-// API helpers - ensure these exist in your api/product-management-api
+
 import {
   getCategoryList,
   addCategory,
   editCategoryType,
   deleteCategoryType,
-  //deleteCategory,
+ 
 } from "../../api/product-management-api";
 
-/**
- * CategoryManager - full page with list + add/edit form modal + delete
- */
+
 const CategoryManager = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);

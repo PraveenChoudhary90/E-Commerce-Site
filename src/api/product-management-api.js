@@ -116,10 +116,7 @@ export async function deleteBanner(id) {
   return response?.data;
 }
 
-export async function deleteProduct(id) {
-  const response = await Axios.delete(`${apiUrl}/delete-product/${id}`);
-  return response?.data;
-}
+
 
 export async function updateProduct(id, data) {
   const response = await Axios.put(`${apiUrl}/update-product/${id}`, data);
@@ -162,10 +159,21 @@ export async function deleteStaticBanner(id) {
 }
 
 
+
 export async function softHideProduct(id) {
-  const response = await Axios.put(`${apiUrl}/soft-hide-product/${id}`);
-  return response?.data;
+  const response = await Axios.delete(
+    `${apiUrl}/product/${id}/soft-delete`
+  );
+  return response.data;
 }
+export async function deleteProduct(id) {
+  const response = await Axios.delete(
+    `${apiUrl}/product/${id}/hard-delete`
+  );
+  return response.data;
+}
+
+
 
 
 export const createAttribute = async (payload) => {

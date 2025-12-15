@@ -234,14 +234,17 @@ const TableComponent = ({ tittle, data = [] }) => {
 
                           <td className="border border-gray-300 p-2">
                             <img
-                              src={
-                                item.images && item.images.length > 0
-                                  ? item.images[0]
-                                  : "https://ik.imagekit.io/ynpnes3kr/products/1764729443583_09bb569962727d1b18ffe061c399c85a42b16169_QqdeYWEsY.png"
-                              }
-                              alt="product"
-                              className="w-auto h-8 object-cover rounded"
-                            />
+  src={
+    item.images && item.images.length > 0
+      ? typeof item.images[0] === "string"
+        ? item.images[0]              // old data
+        : item.images[0].url          // new data
+      : "https://ik.imagekit.io/ynpnes3kr/products/1764729443583_09bb569962727d1b18ffe061c399c85a42b16169_QqdeYWEsY.png"
+  }
+  alt="product"
+  className="w-auto h-8 object-cover rounded"
+/>
+
                           </td>
 
                           <td className="border border-gray-300 p-2 font-light">

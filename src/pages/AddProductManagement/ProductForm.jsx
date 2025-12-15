@@ -18,6 +18,17 @@ import {
   addProductForm,
   updateProduct,
 } from "../../api/product-management-api";
+const isQuillEmpty = (value = "") => {
+  const text = value
+    .replace(/<(.|\n)*?>/g, "")
+    .replace(/&nbsp;/g, "")
+    .trim();
+  return text.length === 0;
+};
+
+// Optional: convert HTML → plain text
+const stripHtml = (html = "") =>
+  html.replace(/<(.|\n)*?>/g, "").replace(/&nbsp;/g, "").trim();
 
 const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, currentPage }) => {
   const initialState = {
@@ -82,19 +93,19 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
       const incomingCategories = Array.isArray(productData.product_category)
         ? productData.product_category.map((c) => (typeof c === "object" ? String(c._id) : String(c)))
         : Array.isArray(productData.category)
-        ? productData.category.map((c) => (typeof c === "object" ? String(c._id) : String(c)))
-        : Array.isArray(productData.product_category)
-        ? productData.product_category.map(String)
-        : [];
+          ? productData.category.map((c) => (typeof c === "object" ? String(c._id) : String(c)))
+          : Array.isArray(productData.product_category)
+            ? productData.product_category.map(String)
+            : [];
 
       // Normalize incoming attributes
       const incomingAttributes = Array.isArray(productData.attributes)
         ? productData.attributes.map((a) => {
-            const attrId = a.attribute?._id || a.attribute || a._id || null;
-            const values =
-              Array.isArray(a.values) ? a.values.map((v) => (typeof v === "object" ? v.name || String(v._id) : String(v))) : [];
-            return { attribute: attrId ? String(attrId) : "", values };
-          })
+          const attrId = a.attribute?._id || a.attribute || a._id || null;
+          const values =
+            Array.isArray(a.values) ? a.values.map((v) => (typeof v === "object" ? v.name || String(v._id) : String(v))) : [];
+          return { attribute: attrId ? String(attrId) : "", values };
+        })
         : [];
 
       setPayload((p) => ({
@@ -191,7 +202,16 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
     if (!payload.pack_size || !payload.pack_size.trim()) temp.pack_size = "Pack Size is required!";
     if (payload.product_mrp === "" || Number(payload.product_mrp) <= 0) temp.product_mrp = "Valid MRP is required!";
     if (payload.franchisee_price === "" || Number(payload.franchisee_price) < 0) temp.franchisee_price = "Valid Franchisee Price is required!";
-    if (!payload.detail_description || !payload.detail_description.trim() || payload.detail_description === "<p><br></p>") temp.detail_description = "Product Description is required!";
+    if (isQuillEmpty(payload.detail_description))
+      temp.detail_description = "Product Description is required!";
+
+    payload.attributes.forEach((a, i) => {
+      if (!a.attribute)
+        temp[`attributes.${i}.attribute`] = "Select parent attribute";
+      if (!a.values.length)
+        temp[`attributes.${i}.values`] = "Select at least one value";
+    });
+    
 
     payload.attributes.forEach((entry, idx) => {
       if (!entry.attribute) temp[`attributes.${idx}.attribute`] = "Select a parent attribute.";
@@ -299,10 +319,23 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
         </div>
 
         <div>
-          <label className="block text-sm font-normal text-gray-700">Detailed Description</label>
-          <ReactQuill value={payload.detail_description} onChange={(value) => setPayload({ ...payload, detail_description: value })} />
-          {errors.detail_description && <p className="text-red-500 text-sm">{errors.detail_description}</p>}
-        </div>
+        <label className="block text-sm font-normal text-gray-700">
+          Detailed Description
+        </label>
+
+        <ReactQuill
+          value={payload.detail_description}
+          onChange={(value) =>
+            setPayload({ ...payload, detail_description: value })
+          }
+        />
+
+        {errors.detail_description && (
+          <p className="text-red-500 text-sm">
+            {errors.detail_description}
+          </p>
+        )}
+      </div>
 
         <div>
           <h3 className="text-base mb-3">Attributes (Parent → Child values)</h3>
@@ -357,28 +390,58 @@ const ProductForm = ({ productData = null, isEditMode = false, setCurrentPage, c
 
         <div>
           <h3 className="text-base mb-3">Product Images</h3>
-          <div className="grid lg:grid-cols-5 md:grid-cols-4 sm:grid-cols-3 grid-cols-2 xl:grid-cols-6 gap-5">
-            {payload.images.map((img, i) => (
-              <div key={`p-${i}`} className="relative w-full h-40">
-                <img src={img} alt={`img-${i}`} onError={(e) => { e.target.onerror = null; e.target.src = "https://coffective.com/wp-content/uploads/2018/06/default-featured-image.png.jpg"; }} className="w-full h-full object-cover rounded-lg" />
-                <button type="button" onClick={() => removePayloadImage(i)} className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center">×</button>
-              </div>
-            ))}
+        <div className="grid lg:grid-cols-5 md:grid-cols-4 sm:grid-cols-3 grid-cols-2 xl:grid-cols-6 gap-5">
+  {payload.images.map((img, i) => (
+    <div key={`p-${i}`} className="relative w-full h-40">
+      <img
+        src={img.url}
+        alt={`img-${i}`}
+        onError={(e) => {
+          e.target.onerror = null;
+          e.target.src =
+            "https://coffective.com/wp-content/uploads/2018/06/default-featured-image.png.jpg";
+        }}
+        className="w-full h-full object-cover rounded-lg"
+      />
 
-            {base64Images.map((b64, i) => (
-              <div key={`b-${i}`} className="relative w-full h-40">
-                <img src={b64} alt={`b-${i}`} className="w-full h-full object-cover rounded-lg" />
-                <button type="button" onClick={() => removeBase64Image(i)} className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center">×</button>
-              </div>
-            ))}
+      <button
+        type="button"
+        onClick={() => removePayloadImage(i)}
+        className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+      >
+        ×
+      </button>
+    </div>
+  ))}
 
-            <div onClick={() => fileInputRef.current?.click()} className="w-full h-40 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer">
-              <div className="text-center">
-                <IoMdAdd className="mx-auto text-2xl text-gray-400" />
-                <p className="text-sm text-gray-500">Add Images</p>
-              </div>
-            </div>
-          </div>
+  {base64Images.map((b64, i) => (
+    <div key={`b-${i}`} className="relative w-full h-40">
+      <img
+        src={b64}
+        alt={`b-${i}`}
+        className="w-full h-full object-cover rounded-lg"
+      />
+
+      <button
+        type="button"
+        onClick={() => removeBase64Image(i)}
+        className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+      >
+        ×
+      </button>
+    </div>
+  ))}
+
+  <div
+    onClick={() => fileInputRef.current?.click()}
+    className="w-full h-40 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer"
+  >
+    <div className="text-center">
+      <IoMdAdd className="mx-auto text-2xl text-gray-400" />
+      <p className="text-sm text-gray-500">Add Images</p>
+    </div>
+  </div>
+</div>
 
           <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleImageChange} />
         </div>

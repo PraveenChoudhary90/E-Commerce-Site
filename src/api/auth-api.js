@@ -145,6 +145,22 @@ export async function getAllEnquiry() {
   const response = await Axios.get(`${apiUrl}/enquiries`);
   return response?.data;
 }
+export async function getAllSupports() {
+  const response = await Axios.get(`/auth/support/admin`);
+  console.log(response)
+  return response?.data;
+}
+export async function closeSupport(id) {
+  const res = await Axios.patch(`/auth/support/close/${id}`);
+  return res?.data;
+}
+
+
+
+export async function replySupport(id, payload) {
+  const response = await Axios.post(`/auth/support/reply/${id}`, payload);
+  return response?.data;
+}
 
 export async function addEvent(payload) {
   const response = await Axios.post(`${apiUrl}/add-event`, payload);
