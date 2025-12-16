@@ -258,8 +258,8 @@ const navigate = useNavigate()
                                                           ? "text-yellow-500"
                                                           : item.kycStatus ===
                                                         "approved"
-                                                        ? "text-red-500"
-                                                        : "text-green-500"
+                                                        ? "text-green-500"
+                                                        : "text-red-500"
                                                   }`}
                                               >
                                                   {item.kycStatus}
