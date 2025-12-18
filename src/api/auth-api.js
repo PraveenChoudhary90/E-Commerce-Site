@@ -146,19 +146,19 @@ export async function getAllEnquiry() {
   return response?.data;
 }
 export async function getAllSupports() {
-  const response = await Axios.get(`/auth/support/admin`);
+  const response = await Axios.get(`${apiUrl}/support/admin`);
   console.log(response)
   return response?.data;
 }
 export async function closeSupport(id) {
-  const res = await Axios.patch(`/auth/support/close/${id}`);
+  const res = await Axios.patch(`${apiUrl}/support/close/${id}`);
   return res?.data;
 }
 
 
 
 export async function replySupport(id, payload) {
-  const response = await Axios.post(`/auth/support/reply/${id}`, payload);
+  const response = await Axios.post(`${apiUrl}/support/reply/${id}`, payload);
   return response?.data;
 }
 

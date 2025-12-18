@@ -11,7 +11,6 @@ import {
 import Swal from "sweetalert2";
 import ProductForm from "./ProductForm";
 import PageLoader from "../../components/ui/PageLoader";
-import CategoryListPage from "./CategoryList";
 import AttributeCrud from "./Attribute";
 
 const tabs = ["Add Product", "Add Category", "Add Attribute"];
@@ -24,6 +23,9 @@ export default function AddProductManagement() {
   const [showEditForm, setShowEditForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // Force ProductForm remount for full reset
+  const [productFormKey, setProductFormKey] = useState(0);
 
   useEffect(() => {
     localStorage.setItem("activeTab", activeTab);
@@ -63,6 +65,12 @@ export default function AddProductManagement() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Called when ProductForm successfully adds a product
+  const handleProductAdded = (newProduct) => {
+    // force ProductForm remount for full reset
+    setProductFormKey((prev) => prev + 1);
   };
 
   return (
@@ -110,7 +118,10 @@ export default function AddProductManagement() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <ProductForm />
+              <ProductForm
+                key={productFormKey} // Force remount on insert
+                onProductAdd={handleProductAdded}
+              />
             </motion.div>
           )}
 
@@ -146,9 +157,7 @@ export default function AddProductManagement() {
                           >
                             <FiEdit />
                           </button>
-                          <button
-                            onClick={() => handleDelete(category._id)}
-                          >
+                          <button onClick={() => handleDelete(category._id)}>
                             <MdDelete />
                           </button>
                         </div>
@@ -182,7 +191,7 @@ export default function AddProductManagement() {
             </motion.div>
           )}
 
-          {/* Tab 2: Add Category list */}
+          {/* Tab 2: Add Attribute */}
           {activeTab === 2 && (
             <motion.div
               key="Attribute"
@@ -191,7 +200,7 @@ export default function AddProductManagement() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <AttributeCrud/> 
+              <AttributeCrud />
             </motion.div>
           )}
         </div>

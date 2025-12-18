@@ -28,18 +28,14 @@ const VendorManagementForm = () => {
         companyName: "",
         businessType: "",
         gstin: "",
-        nocExpiryDate: "",
-        mcaExpiryDate: "",
         adharCardImg: "",
         panCardImg: "",
-        mcaImg: "",
         gstCertificateImg: "",
         businessAddressImg: "",
         businessEmail: "",
         businessMobile: "",
         aadharNo: "",
         pancardNo: "",
-        mcaNo: "",
         address: "",
         businessPancardNo: "",
         businessPanCardImg: "",
@@ -66,20 +62,16 @@ const VendorManagementForm = () => {
             state: userInfo?.state || "",
             city: userInfo?.city || "",
             pincode: userInfo?.pincode || "",
-            companyName: userInfo?.shopname || "",
+            companyName: userInfo?.companyName || "",
             businessType: userInfo?.businessType || "",
             aadharNo: userInfo?.aadharNo || "",
-            adharCardImg: userInfo?.dharCardImg|| "",
+            adharCardImg: userInfo?.adharCardImg|| "",
             pancardNo: userInfo?. pancardNo || "",
             panCardImg: userInfo?.panCardImg || "",
-            mcaImg: userInfo?.mcaImg || "",
-            mcaExpiryDate: userInfo?. mcaExpiryDate || "",
-            mcaNo: userInfo?.mcaNo || "",
             businessAddressImg: userInfo?. businessAddressImg || "",
             address: userInfo?.address || "",
             businessEmail: userInfo?.businessEmail || "",
             businessMobile: userInfo?. businessMobile || "",
-            nocExpiryDate: userInfo?.nocExpiryDate || "",
             gstin: userInfo?. gstin|| "",
             gstCertificateImg: userInfo?. gstCertificateImg || "",
             businessPancardNo: userInfo?.businessPancardNo || "",
@@ -268,7 +260,7 @@ const VendorManagementForm = () => {
                             name="businessType"
                             value={formData.businessType}
                         />
-                        <InputField
+                        {/* <InputField
                             disabled
                             label="MCA Number*"
                             name="mcaNo"
@@ -286,7 +278,7 @@ const VendorManagementForm = () => {
                             type="date"
                             name="mcaExpiryDate"
                             value={formData.mcaExpiryDate}
-                        />
+                        /> */}
                         <InputField
                             disabled
                             label="Business Contact Mobile*"
@@ -327,13 +319,7 @@ const VendorManagementForm = () => {
                             image={formData?.gstCertificateImg}
                             title={"GST Certificatte"}
                         />
-                        <InputField
-                            disabled
-                            label="NOC Expiry Date*"
-                            type="date"
-                            name="nocExpiryDate"
-                            value={formData.nocExpiryDate}
-                        />
+                    
 
                         <ImageViewField
                             image={formData?.businessAddressImg}
