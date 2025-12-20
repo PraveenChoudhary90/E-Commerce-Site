@@ -271,7 +271,7 @@ const ProductForm = ({
       <div className="space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           <InputField label="Product ID" value={payload.productId} onChange={(e) => setPayload({ ...payload, productId: e.target.value })} />
-          <InputField label="Combination" value={payload.combination} onChange={(e) => setPayload({ ...payload, combination: e.target.value })} error={errors.combination} />
+          <InputField label="Product Name" value={payload.combination} onChange={(e) => setPayload({ ...payload, combination: e.target.value })} error={errors.combination} />
           <InputField label="Stock" type="number" value={payload.stock} onChange={(e) => setPayload({ ...payload, stock: e.target.value })} error={errors.stock} />
           <InputField label="Pack Size" value={payload.pack_size} onChange={(e) => setPayload({ ...payload, pack_size: e.target.value })} error={errors.pack_size} />
           <InputField label="GST %" type="number" value={payload.gst_in_percentage} onChange={(e) => setPayload({ ...payload, gst_in_percentage: e.target.value })} />
