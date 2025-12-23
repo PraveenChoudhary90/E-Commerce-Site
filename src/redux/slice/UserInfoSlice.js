@@ -1,22 +1,32 @@
-
 import { createSlice } from "@reduxjs/toolkit";
 
+// Load initial state from localStorage if available
 const initialState = {
-  userInfo: null, 
+  userInfoadmin: localStorage.getItem("userInfoadmin")
+    ? JSON.parse(localStorage.getItem("userInfoadmin"))
+    : null,
 };
 
 export const UserInfo = createSlice({
-  name: "UserInfo",
+  name: "userInfoadmin",
   initialState,
   reducers: {
     setUserInfo: (state, action) => {
-      state.userInfo = action.payload;
+      state.userInfoadmin = action.payload;
+      // Save to localStorage
+      localStorage.setItem("userInfoadmin", JSON.stringify(action.payload));
     },
     updateUserInfo: (state, action) => {
-      state.userInfo = { ...state.userInfo, ...action.payload }; 
+      state.userInfoadmin = { ...state.userInfoadmin, ...action.payload };
+      // Save updated info to localStorage
+      localStorage.setItem("userInfoadmin", JSON.stringify(state.userInfoadmin));
+    },
+    clearUserInfo: (state) => {
+      state.userInfoadmin = null;
+      localStorage.removeItem("userInfoadmin");
     },
   },
 });
 
-export const { setUserInfo, updateUserInfo } = UserInfo.actions;
+export const { setUserInfo, updateUserInfo, clearUserInfo } = UserInfo.actions;
 export default UserInfo.reducer;

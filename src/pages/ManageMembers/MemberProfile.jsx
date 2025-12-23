@@ -6,7 +6,6 @@ import { getMemberById } from "../../api/auth-api";
 import { useParams } from "react-router-dom";
 import AddMemberPopup from "./AddMemberPopup";
 import Footer1 from "../../components/Footer1";
-import { FaPen } from "react-icons/fa6";
 
 // Placeholder images
 const DEFAULT_USER_IMG = "https://via.placeholder.com/150?text=User";
@@ -48,101 +47,92 @@ const MemberProfile = () => {
 
         {/* Images Section */}
         <div className="bg-white p-4 mt-16 rounded-xl space-y-5">
-          <div className="flex gap-3 items-center justify-between">
-            <h1 className="font-medium lg:text-xl md:text-lg text-base">
-              Profile Information
-            </h1>
-            <Button title={"Edit"} onClick={togglePopup} />
-          </div>
-
+          <h1 className="font-medium lg:text-xl md:text-lg text-base mb-4">
+            Profile Images
+          </h1>
           <div className="flex justify-center gap-8 mb-4">
             {/* User Image */}
-            <div className="flex flex-col items-center relative">
+            <div className="flex flex-col items-center">
               <img
                 src={data?.userPicUrl || DEFAULT_USER_IMG}
                 alt="User"
                 className="w-32 h-32 rounded-full object-cover border"
               />
-              <FaPen
-                className="absolute top-0 right-0 text-gray-600 cursor-pointer"
-                onClick={togglePopup}
-              />
               <span className="mt-2 text-sm text-gray-600">User Image</span>
             </div>
 
             {/* Aadhaar Image */}
-            <div className="flex flex-col items-center relative">
+            <div className="flex flex-col items-center">
               <img
                 src={data?.aadhaarPicUrl || DEFAULT_AADHAAR_IMG}
                 alt="Aadhaar"
                 className="w-32 h-32 rounded-xl object-cover border"
               />
-              <FaPen
-                className="absolute top-0 right-0 text-gray-600 cursor-pointer"
-                onClick={togglePopup}
-              />
               <span className="mt-2 text-sm text-gray-600">Aadhaar Image</span>
             </div>
 
             {/* PAN Image */}
-            <div className="flex flex-col items-center relative">
+            <div className="flex flex-col items-center">
               <img
                 src={data?.panPicUrl || DEFAULT_PAN_IMG}
                 alt="PAN"
                 className="w-32 h-32 rounded-xl object-cover border"
               />
-              <FaPen
-                className="absolute top-0 right-0 text-gray-600 cursor-pointer"
-                onClick={togglePopup}
-              />
               <span className="mt-2 text-sm text-gray-600">PAN Image</span>
-            </div>
-          </div>
-
-          {/* Profile Details */}
-          <div className="flex flex-wrap items-center justify-center gap-5 text-sm">
-            <div className="flex gap-2 items-center text-gray-500 relative">
-              <b>Full Name: </b>
-              <p>{data?.name}</p>
-              <FaPen
-                className="ml-1 text-gray-400 cursor-pointer"
-                onClick={togglePopup}
-              />
-            </div>
-            <div className="flex gap-2 items-center text-gray-500">
-              <b>Active User: </b>
-              <p>{data?.status === "approved" ? "Yes" : "No"}</p>
-            </div>
-            <div className="flex gap-2 items-center text-gray-500">
-              <b>Mobile: </b>
-              <p>{data?.mobile}</p>
-            </div>
-            <div className="flex gap-2 items-center text-gray-500">
-              <b>Email: </b>
-              <p>{data?.email}</p>
-            </div>
-            <div className="flex gap-2 items-center text-gray-500">
-              <b>Status: </b>
-              <p>{data?.status}</p>
-            </div>
-            <div className="flex gap-2 items-center text-gray-500">
-              <b>PAN Number: </b>
-              <p>{data?.panNumber || "N/A"}</p>
-            </div>
-            <div className="flex gap-2 items-center text-gray-500">
-              <b>Location: </b>
-              <p>India</p>
             </div>
           </div>
         </div>
 
+        {/* Profile Details as Table */}
+        <div className="overflow-x-auto bg-white p-4 mt-4 rounded-xl">
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="font-medium lg:text-xl md:text-lg text-base">
+              Profile Information
+            </h1>
+            <Button title={"Edit"} onClick={togglePopup} className="text-white" />
+          </div>
+
+          <table className="w-full border-collapse text-gray-700">
+            <tbody>
+              <tr className="border-b">
+                <td className="py-2 font-semibold w-1/3">Full Name</td>
+                <td className="py-2">{data?.name}</td>
+              </tr>
+              <tr className="border-b">
+                <td className="py-2 font-semibold">Active User</td>
+                <td className="py-2">{data?.status === "approved" ? "Yes" : "No"}</td>
+              </tr>
+              <tr className="border-b">
+                <td className="py-2 font-semibold">Mobile</td>
+                <td className="py-2">{data?.mobile}</td>
+              </tr>
+              <tr className="border-b">
+                <td className="py-2 font-semibold">Email</td>
+                <td className="py-2">{data?.email}</td>
+              </tr>
+              <tr className="border-b">
+                <td className="py-2 font-semibold">Status</td>
+                <td className="py-2">{data?.status}</td>
+              </tr>
+              <tr className="border-b">
+                <td className="py-2 font-semibold">PAN Number</td>
+                <td className="py-2">{data?.panNumber || "N/A"}</td>
+              </tr>
+              <tr>
+                <td className="py-2 font-semibold">Location</td>
+                <td className="py-2">India</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
         {/* Platform Settings */}
-        <div className="bg-white p-4 rounded-xl space-y-5">
+        <div className="bg-white p-4 rounded-xl space-y-5 mt-4">
           <div className="flex gap-3 items-center justify-between">
             <h1 className="font-medium lg:text-xl md:text-lg text-base">
               Platform Settings
             </h1>
-            <Button title={"Edit"} onClick={togglePopup} />
+            <Button title={"Edit"} onClick={togglePopup} className="text-white" />
           </div>
           <div className="grid xl:grid-cols-2 lg:grid-cols-3 md:grid-cols-2 gap-3 grid-cols-1">
             <div className="text-gray-400 space-y-4">

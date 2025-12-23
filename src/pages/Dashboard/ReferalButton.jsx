@@ -19,13 +19,13 @@ const ReferalButton = () => {
 
     return (
         <div>
-            <div className='w-full flex sm:flex-row flex-col justify-between bg-white rounded-2xl p-3'>
+            {/* <div className='w-full flex sm:flex-row flex-col justify-between bg-white rounded-2xl p-3'> */}
                 <div>
-                <h1 className='text-lg font-medium'>👋</h1>
-                    <h1 className='text-lg font-medium'>  Invite new customers to join on board!</h1>
+                {/* <h1 className='text-lg font-medium'>👋</h1>
+                    <h1 className='text-lg font-medium'>  Invite new customers to join on board!</h1> */}
                   
-                </div>
-                <div className='flex items-center justify-between gap-3'>
+                {/* </div> */}
+                {/* <div className='flex items-center justify-between gap-3'>
                     <p className='font-normal text-sm'>Referral Code: MAIN_REF_12345</p>
                     <button 
                         onClick={handleCopy} 
@@ -33,7 +33,7 @@ const ReferalButton = () => {
                     >
                         Copy
                     </button>
-                </div>
+                </div> */}
             </div>
         </div>
     );

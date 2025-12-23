@@ -20,22 +20,21 @@ import { loginWithEmailAdmin } from "../../api/auth-api";
 import Swal from "sweetalert2";
 import { Routers } from "../../constants/Routes";
 
+// Redux
+import { useDispatch } from "react-redux";
+import { setUserInfo } from "../../redux/slice/UserInfoSlice";
+
 const LoginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
 });
 
 const Login = () => {
-
   const [showPassword, setShowPassword] = useState(false);
-
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  };
-
-
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const form = useForm({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
@@ -44,17 +43,33 @@ const Login = () => {
     },
   });
 
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   const onSubmit = async (data) => {
     try {
-      // console.log(data);
       setLoading(true);
       const response = await loginWithEmailAdmin(data);
-      console.log(response)
+
+      // Save token in localStorage
       localStorage.setItem("token", response?.token);
-      form.reset({
-        email: "",
-        password: "",
-      });
+
+      // Prepare admin info
+      const adminDetails = {
+        name: response?.user?.firstname,
+        email: response?.user?.email,
+        role: response?.user?.role,
+      };
+
+      // Save admin info in localStorage
+      localStorage.setItem("userInfoadmin", JSON.stringify(adminDetails));
+
+      // Save admin info in Redux Toolkit
+      dispatch(setUserInfo(adminDetails));
+
+      form.reset({ email: "", password: "" });
+
       Swal.fire({
         icon: "success",
         title: "Login Success",
@@ -63,12 +78,8 @@ const Login = () => {
         willClose: () => {
           navigate(Routers.Dashboard);
           window.location.reload();
-        }
+        },
       });
-      setTimeout(() => {
-        navigate(Routers.Dashboard);
-        window.location.reload();
-      }, 3000);
     } catch (error) {
       console.error("Error:", error?.message);
       Swal.fire({
@@ -94,25 +105,18 @@ const Login = () => {
       >
         <div className="w-full md:w-2/6 py-10 p-4 bg-[#ffffff6a] backdrop-blur-md rounded-3xl border shadow-[0_0_10px_rgba(0,0,0,0.1)] flex flex-col items-center">
           <div className="flex justify-center mb-6">
-            <img
-              src={MainContent.logo}
-              alt="Bionova Logo"
-              className="w-[200px] h-auto"
-            />
+            <img src={MainContent.logo} alt="Bionova Logo" className="w-[200px] h-auto" />
           </div>
-          <p className="uppercase text-center text-sm md:text-base whitespace-nowrap font-semibold mx-auto">India&apos;s first B2B medi-commerce platform</p>
+          <p className="uppercase text-center text-sm md:text-base font-semibold mx-auto break-words text-ellipsis">
+            India&apos;s first B2B medi-commerce platform
+          </p>
           <h1 className="text-xl font-semibold text-center mt-5 mb-2 uppercase">Admin Login</h1>
 
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="flex flex-col gap-5 w-full mb-5"
-            >
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5 w-full mb-5">
               {/* EMAIL INPUT */}
               <FormItem>
-                <FormLabel className="text-sm font-light text-[#555555]">
-                  Email Address
-                </FormLabel>
+                <FormLabel className="text-sm font-light text-[#555555]">Email Address</FormLabel>
                 <div className="flex items-center justify-between bg-[#fbfdfe] rounded-md border border-input">
                   <FormControl>
                     <Input
@@ -121,23 +125,16 @@ const Login = () => {
                       className="bg-transparent border-none outline-none shadow-none focus-visible:ring-0"
                     />
                   </FormControl>
-                  <div
-                    className={`p-3 bg-bg-color rounded-md ${form.formState.errors.email ? "bg-red-500" : "bg-bg-color"
-                      }`}
-                  >
+                  <div className={`p-3 rounded-md ${form.formState.errors.email ? "bg-red-500" : "bg-bg-color"}`}>
                     <AiOutlineMail className="text-white text-2xl" />
                   </div>
                 </div>
-                <FormMessage className="h-4">
-                  {form.formState.errors.email?.message || ""}
-                </FormMessage>
+                <FormMessage className="h-4">{form.formState.errors.email?.message || ""}</FormMessage>
               </FormItem>
 
               {/* PASSWORD INPUT */}
               <FormItem>
-                <FormLabel className="text-sm font-light text-[#555555]">
-                  Password
-                </FormLabel>
+                <FormLabel className="text-sm font-light text-[#555555]">Password</FormLabel>
                 <div className="flex items-center justify-between bg-[#fbfdfe] rounded-md border border-input">
                   <FormControl>
                     <Input
@@ -148,27 +145,16 @@ const Login = () => {
                     />
                   </FormControl>
                   <div
-                    className={`p-3 bg-bg-color rounded-md cursor-pointer ${form.formState.errors.password ? "bg-red-500" : "bg-bg-color"
-                      }`}
+                    className={`p-3 rounded-md cursor-pointer ${form.formState.errors.password ? "bg-red-500" : "bg-bg-color"}`}
                     onClick={togglePasswordVisibility}
                   >
-                    {showPassword ? (
-                      <AiOutlineUnlock className="text-white text-2xl" />
-                    ) : (
-                      <AiOutlineLock className="text-white text-2xl" />
-                    )}
+                    {showPassword ? <AiOutlineUnlock className="text-white text-2xl" /> : <AiOutlineLock className="text-white text-2xl" />}
                   </div>
                 </div>
-                <FormMessage className="h-4">
-                  {form.formState.errors.password?.message || ""}
-                </FormMessage>
+                <FormMessage className="h-4">{form.formState.errors.password?.message || ""}</FormMessage>
               </FormItem>
 
-              {/* LOGIN BUTTON */}
-              <Button
-                type="submit"
-                className="whitespace-nowrap w-full py-2 px-10 bg-bg-color text-white font-semibold rounded-lg text-lg"
-              >
+              <Button type="submit" className="whitespace-nowrap w-full py-2 px-10 bg-bg-color text-white font-semibold rounded-lg text-lg">
                 Login
               </Button>
             </form>

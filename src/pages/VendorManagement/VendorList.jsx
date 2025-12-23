@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { getSellerListToVerify } from "../../api/auth-api";
 import PageLoader from "../../components/ui/PageLoader";
 import SelectComponent from "../../components/SelectComponent";
+import Swal from "sweetalert2";
 
 /* 🇮🇳 India States List */
 const INDIA_STATES = [
@@ -338,6 +339,15 @@ const VendorList = ({ tittle }) => {
 
   /* Navigate */
   const handleNavigateToVendorDetails = (item) => {
+     if (item.kycStatus === "approved" || item.kycStatus === "rejected") {
+      Swal.fire({
+        icon: "info",
+        title: "Action Restricted",
+        text: "You have already worked on it.",
+        confirmButtonColor: "#16a34a",
+      });
+      return;
+    }
     navigate(`/franchisee-details/${item._id}`, { state: item });
   };
 
@@ -349,16 +359,17 @@ const VendorList = ({ tittle }) => {
         <div className="p-5 bg-white rounded-xl space-y-5">
 
           {/* 🔍 Search */}
-          <div className="flex justify-between items-center gap-4">
-            <h2 className="text-xl font-medium text-gray-800">{tittle}</h2>
-            <input
-              type="text"
-              placeholder="Search Franchisee / ID / Company"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md text-sm"
-            />
-          </div>
+<div className="flex justify-between items-center gap-4">
+  <h2 className="text-xl font-medium text-gray-800">{tittle}</h2>
+  <input
+    type="text"
+    placeholder="Search Vendor / ID / Company"
+    value={searchInput}
+    onChange={(e) => setSearchInput(e.target.value)}
+    className="flex-1 max-w-xs p-2 border border-gray-300 rounded-md text-sm"
+  />
+</div>
+
 
           {/* 🎯 Filters */}
           <div className="p-5 border rounded-xl shadow space-y-4">
@@ -405,8 +416,8 @@ const VendorList = ({ tittle }) => {
               <thead>
                 <tr className="bg-gray-100">
                   <th className="border p-2">SL</th>
-                  <th className="border p-2">Franchisee</th>
-                  <th className="border p-2">Franchisee ID</th>
+                  <th className="border p-2">Vendor Name</th>
+                  <th className="border p-2">Vendor ID</th>
                   <th className="border p-2">Company</th>
                   <th className="border p-2">KYC Status</th>
                   <th className="border p-2">Action</th>

@@ -20,6 +20,8 @@ import PageLoader from "../components/ui/PageLoader";
 import { useDispatch, useSelector } from "react-redux";
 import { Routers } from "../constants/Routes";
 import { RiCoupon2Line } from "react-icons/ri";
+import { MdOutlineBorderAll } from "react-icons/md";
+import { FaProductHunt } from "react-icons/fa6";
 
 const Layout = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -27,8 +29,7 @@ const Layout = () => {
     const navigate = useNavigate();
 
     const location = useLocation();
-    const userInfo = useSelector((state) => state.userInfo.userInfo);
-    console.log(userInfo)
+    const userInfo = useSelector((state) => state.userInfo.userInfoadmin);
     let page = location.pathname.split("/")[1];
     page = page.charAt(0).toUpperCase() + page.slice(1);
     page = page.replace(/-/g, " ");
@@ -46,7 +47,7 @@ const Layout = () => {
         { path: "/", label: "Dashboard", icon: <FaHome /> },
         {
             path: Routers.VENDOR_MANAGEMENT,
-            label: "Franchisee Management",
+            label: "Vendor Management",
             icon: <BiSolidShoppingBags />,
         },
         {
@@ -59,6 +60,18 @@ const Layout = () => {
             label: "All Product List",
             icon: <BiSolidShoppingBags />,
         },
+        
+          {
+            path: Routers.HISTORY,
+            label: "Order Details",
+            icon: <MdOutlineBorderAll />,
+        },
+        {
+            path:Routers.ProductDisplay,
+            label:"Manage All Product",
+            icon: <FaProductHunt />,
+
+        },
         // {
         //     path: Routers.CATEGORY_MANAGMENT,
         //     label: "All Category List",
@@ -69,6 +82,7 @@ const Layout = () => {
             label: "Inventory Report",
             icon: <MdOutlineInventory />,
         },
+        
         {
             path: "/marketing-tool",
             label: "Marketing Tools",
@@ -84,6 +98,7 @@ const Layout = () => {
             label: "Reward Management",
             icon: <HiOutlineMailOpen />,
         },
+
         {
             path: Routers.CONTENT_MANAGEMENT,
             label: "Banners",
@@ -106,7 +121,7 @@ const Layout = () => {
         },
         {
             path: Routers.MANAGE_MEMBERS,
-            label: "User Management",
+            label: "MR Management",
             icon: <MdManageAccounts />,
         }
     ];

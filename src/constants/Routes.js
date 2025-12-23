@@ -19,7 +19,7 @@ export const Routers = {
   AddCategories: "/add-category",
   AddCategoryType: "/add-category-type",
   AddCategoryBrand: "/add-category-brand",
-  VendorManagement: "/franchisee-management",
+  VendorManagement: "/vendor-management",
   Notification: "/notification",
   VendorDetails: "/franchisee-details/:id",
   NotFound: "*",
@@ -32,7 +32,7 @@ export const Routers = {
   MANAGE_MEMBERS: "/manage-members",
   EMAIL_MANAGEMENT: "/email-management",
   EMAIL_MESSAGE: "/email-message",
-  VENDOR_MANAGEMENT: "/franchisee-management",
+  VENDOR_MANAGEMENT: "/vendor-management",
   NOTIFICATION: "/notification",
   VENDOR_DETAILS: "/franchisee-details",
   ADD_COUPON: "/offer-management",
@@ -44,4 +44,6 @@ export const Routers = {
    STATIC_BANNER:"/static-banner",
   REFERRAL_MANAGEMENT: "/referral-management",
   GALLERY_MANAGEMENT: "/gallery-management",
+  HISTORY:"/order-history",
+  ProductDisplay:"/ProductDisplay"
 };

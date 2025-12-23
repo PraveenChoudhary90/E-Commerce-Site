@@ -36,6 +36,8 @@ import OfferManagement from "./pages/Coupon/OfferManagement";
 import StaticBanner from "./pages/StaticBanner/StaticBanner";
 import ReferralManagement from "./pages/ReferralManagement";
 import GalleryManagement from "./pages/GalleryManagement/GalleryManagement";
+import OrderHistory from "./pages/OrderDetailPage";
+import ProductCard from "./pages/AllProductDataAdd";
 // import CategoryList from "./pages/AddProductManagement/CategoryList";
 //import CategoryList from "./pages/AddProductManagement/CategoryList";
 
@@ -78,6 +80,13 @@ const RoutersPages = () => {
                 path={Routers.REFERRAL_MANAGEMENT}
                 element={<ReferralManagement />}
               />
+              <Route path={Routers.HISTORY}
+              element={<OrderHistory/>}
+              />
+              <Route path={Routers.ProductDisplay}
+              element={<ProductCard/>}
+              />
+
               <Route
                 path={Routers.EarningManagement}
                 element={<EarningManagement />}

@@ -25,6 +25,50 @@ export async function getDashboardDetails() {
   return response?.data;
 }
 
+
+
+
+
+
+export async function getOrderDetails() {
+  const response = await Axios.get(`${apiUrl}/get-order-details`);
+  return response?.data;
+}
+
+
+export async function getCategories() {
+  const response = await Axios.get(`${apiUrl}/get-product-details`);
+  return response?.data;
+}
+
+// 🔹 UPDATE PRODUCT
+export async function updateItem(id, data) {
+  try {
+    const response = await Axios.put(`${apiUrl}/update-product/${id}`, data, {
+      headers: {
+        "Content-Type": "multipart/form-data", 
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Error updating product:", error);
+    throw error;
+  }
+}
+
+// 🔹 DELETE PRODUCT
+export async function deleteItem(id) {
+  try {
+    const response = await Axios.delete(`${apiUrl}/delete-product/${id}`);
+    return response;
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    throw error;
+  }
+}
+
+
+
 export async function CreateMember(payload) {
   const response = await Axios.post(`${apiUrl}/create-member`, payload);
   return response?.data;
