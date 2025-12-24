@@ -36,7 +36,6 @@ const OrderHistory = () => {
 
   const handleDetail = (order) => {
     setSelectedOrder(order);
-    console.log("Order Details:", order);
   };
 
   const handleCloseModal = () => {

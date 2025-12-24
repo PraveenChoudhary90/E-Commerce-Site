@@ -58,7 +58,7 @@ const Dashboard = () => {
     }
   ];
 
-  // ✅ 1. Fetch Orders & calculate Today's Sales and Total Sales
+  //  1. Fetch Orders & calculate Today's Sales and Total Sales
   const fetchSalesFromOrders = async () => {
   try {
     const res = await getOrderDetails();
@@ -90,7 +90,6 @@ const Dashboard = () => {
       }
     });
 
-    console.log("TODAY SALES:", todaysSales, "TOTAL SALES:", totalSales);
 
     return { todaysSales, totalSales };
   } catch (error) {
@@ -100,7 +99,7 @@ const Dashboard = () => {
 };
 
 
-  // ✅ 2. Fetch Vendors & calculate Today's and Total Vendors
+  //  2. Fetch Vendors & calculate Today's and Total Vendors
   const fetchVendorStats = async () => {
     const res = await getSellerListToVerify();
     const vendors = res?.data || [];
@@ -115,7 +114,7 @@ const Dashboard = () => {
     return { totalUsers, todaysUsers };
   };
 
-  // ✅ 3. Combine Sales and Vendor stats
+  //  3. Combine Sales and Vendor stats
   const fetchDashboardStats = async () => {
     try {
       setLoading(true);
@@ -142,7 +141,7 @@ const Dashboard = () => {
     }
   };
 
-  // ✅ 4. Fetch Dashboard Data (members, topProducts, topBrands, etc.)
+  //  4. Fetch Dashboard Data (members, topProducts, topBrands, etc.)
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
@@ -160,7 +159,7 @@ const Dashboard = () => {
     }
   };
 
-  // ✅ 5. Fetch Vendor Data to Redux store
+  //  5. Fetch Vendor Data to Redux store
   useEffect(() => {
     const fetchVendorData = async () => {
       try {
@@ -181,7 +180,7 @@ const Dashboard = () => {
     fetchVendorData();
   }, [dispatch]);
 
-  // ✅ 6. Fetch dashboard stats on mount
+  //  6. Fetch dashboard stats on mount
   useEffect(() => {
     fetchDashboardStats();
     fetchDashboardData();
