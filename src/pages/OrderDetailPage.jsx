@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 // import { getOrderDetails } from "../api/vendor-api";
 import { getOrderDetails } from "../api/auth-api";
 import { useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 const OrderHistory = () => {
   const [filter, setFilter] = useState("all");
@@ -41,17 +43,44 @@ const OrderHistory = () => {
     setSelectedOrder(null);
   };
 
+  const handleDownloadPDF = async () => {
+    if (!selectedOrder) return;
+
+    const modal = document.getElementById("order-detail-modal");
+    if (!modal) return;
+
+    // Clone modal and remove Download button
+    const clone = modal.cloneNode(true);
+    const downloadButton = clone.querySelector("button");
+    if (downloadButton) downloadButton.remove();
+
+    // Move clone off-screen
+    clone.style.position = "absolute";
+    clone.style.left = "-9999px";
+    document.body.appendChild(clone);
+
+    // Capture cloned modal as image
+    const canvas = await html2canvas(clone, { scale: 2 });
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF("p", "mm", "a4");
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`Invoice_${selectedOrder._id}.pdf`);
+
+    document.body.removeChild(clone);
+  };
+
   return (
     <>
-      {/* {loading && <PageLoader />} */}
-
       <div className="p-4">
-        <h1 className="text-xl font-semibold mb-1">Vender Order History</h1>
+        <h1 className="text-xl font-semibold mb-1">Vendor Order History</h1>
         <p className="text-gray-600 mb-4">
           Total Orders: <strong>{filteredOrders.length}</strong>
         </p>
 
-        {/* Filter Dropdown */}
         <div className="mb-4">
           <select
             className="p-2 border min-w-52 border-gray-300 rounded-lg"
@@ -65,14 +94,13 @@ const OrderHistory = () => {
           </select>
         </div>
 
-        {/* Orders Table */}
         {filteredOrders.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full border border-gray-300">
               <thead>
                 <tr className="bg-gray-200 text-center">
                   <th className="border px-4 py-2">Index</th>
-                  <th className="border px-4 py-2">User Name</th>
+                  <th className="border px-4 py-2">Vendor Name</th>
                   <th className="border px-4 py-2">Email</th>
                   <th className="border px-4 py-2">Phone</th>
                   <th className="border px-4 py-2">Address</th>
@@ -91,9 +119,8 @@ const OrderHistory = () => {
                     <td className="border px-4 py-2">{order.user?.email}</td>
                     <td className="border px-4 py-2">{order.user?.phone}</td>
                     <td className="border px-4 py-2 text-left whitespace-nowrap overflow-hidden text-ellipsis">
-  {`${order.address?.address}, ${order.address?.city}, ${order.address?.state}, ${order.address?.country} - ${order.address?.pincode}`}
-</td>
-
+                      {`${order.address?.address}, ${order.address?.city}, ${order.address?.state}, ${order.address?.country} - ${order.address?.pincode}`}
+                    </td>
                     <td className="border px-4 py-2">{order.paymentType}</td>
                     <td className="border px-4 py-2">
                       {order.totalAmount?.toFixed(2) || "0.00"}
@@ -127,7 +154,10 @@ const OrderHistory = () => {
       {/* Modal */}
       {selectedOrder && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg w-11/12 max-w-2xl p-6 relative">
+          <div
+            id="order-detail-modal"
+            className="bg-white rounded-lg shadow-lg w-11/12 max-w-2xl p-6 relative"
+          >
             <h2 className="text-xl font-bold mb-4">Order Details</h2>
             <button
               className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
@@ -136,9 +166,9 @@ const OrderHistory = () => {
               ✖
             </button>
 
-            <div className="space-y-2 text-left">
+            <div className="space-y-2 text-left max-h-[60vh] overflow-y-auto">
               <p>
-                <strong>User:</strong> {selectedOrder.user?.name} (
+                <strong>Vendor:</strong> {selectedOrder.user?.name} (
                 {selectedOrder.user?.email}, {selectedOrder.user?.phone})
               </p>
               <p>
@@ -175,6 +205,15 @@ const OrderHistory = () => {
                     <p><strong>Description:</strong> {p.description || "N/A"}</p>
                   </div>
                 ))}
+              </div>
+
+              <div className="flex justify-end mt-4">
+                <button
+                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                  onClick={handleDownloadPDF}
+                >
+                  Download Invoice
+                </button>
               </div>
             </div>
           </div>
