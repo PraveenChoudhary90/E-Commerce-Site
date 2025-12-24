@@ -45,7 +45,8 @@ const AddCategories = () => {
         title: "Category Added!",
         text: "Category Added Successfully",
       }).then(() => (
-        window.location.reload()
+        // window.location.reload()
+        console.log("kk")
 
       ))
 

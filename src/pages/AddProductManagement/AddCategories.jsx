@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import PageLoader from "../../components/ui/PageLoader";
@@ -6,27 +5,24 @@ import Button from "../../components/Button";
 import InputField from "../../components/InputField";
 import { FaPlus, FaTrash, FaEdit } from "react-icons/fa";
 
-
 import {
   getCategoryList,
   addCategory,
   editCategoryType,
   deleteCategoryType,
- 
 } from "../../api/product-management-api";
 
+/* ===================== CATEGORY MANAGER ===================== */
 
 const CategoryManager = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
 
-  // modal state
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  // refresh list
   useEffect(() => {
     loadCategories();
   }, []);
@@ -35,12 +31,11 @@ const CategoryManager = () => {
     try {
       setFetching(true);
       const resp = await getCategoryList();
-      // adapt if your API returns { categories: [...] }
       const arr = Array.isArray(resp) ? resp : resp?.categories || [];
       setCategories(arr);
     } catch (err) {
       console.error("loadCategories err:", err);
-      Swal.fire({ icon: "error", title: "Error", text: "Failed to load categories" });
+      Swal.fire("Error", "Failed to load categories", "error");
     } finally {
       setFetching(false);
     }
@@ -67,16 +62,17 @@ const CategoryManager = () => {
       confirmButtonText: "Yes, delete",
       cancelButtonText: "Cancel",
     });
+
     if (!res.isConfirmed) return;
 
     try {
       setLoading(true);
       await deleteCategoryType(cat._id);
-      Swal.fire({ icon: "success", title: "Deleted", text: "Category deleted" });
-      await loadCategories();
+      Swal.fire("Deleted", "Category deleted", "success");
+      loadCategories();
     } catch (err) {
       console.error("deleteCategory err:", err);
-      Swal.fire({ icon: "error", title: "Error", text: err?.response?.data?.message || "Delete failed" });
+      Swal.fire("Error", "Delete failed", "error");
     } finally {
       setLoading(false);
     }
@@ -84,73 +80,91 @@ const CategoryManager = () => {
 
   return (
     <div className="p-6">
-      {fetching ? <PageLoader /> : null}
+      {fetching && <PageLoader />}
 
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex justify-between mb-6">
         <h1 className="text-2xl font-semibold">Categories</h1>
+
         <div className="flex items-center gap-2">
+          <Button title="Refresh" onClick={loadCategories} bgcolor="bg-gray-200" />
           <Button
-            onClick={loadCategories}
-            title="Refresh"
-            bgcolor="bg-gray-200"
-          />
-          <Button
-            onClick={openAddModal}
             title="Add Category"
             bgcolor="bg-[#32C98D]"
             className="flex items-center gap-2"
+            onClick={openAddModal}
           >
             <FaPlus />
-            <span className="text-white">{/* label shown by title prop */}</span>
           </Button>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm p-4">
+      {/* ===================== TABLE VIEW ===================== */}
+      <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
         {categories.length === 0 ? (
           <div className="text-center py-8 text-gray-500">No categories found</div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {categories.map((cat) => (
-              <div key={cat._id} className="border rounded p-3 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 bg-gray-100 rounded overflow-hidden flex items-center justify-center">
-                    {cat.image ? (
-                      // eslint-disable-next-line jsx-a11y/img-redundant-alt
-                      <img src={cat.image} alt={`${cat.name} image`} className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-xs text-gray-400">No image</span>
-                    )}
-                  </div>
-                  <div>
-                    <div className="font-medium">{cat.name}</div>
-                    <div className="text-xs text-gray-500">{cat._id}</div>
-                  </div>
-                </div>
+          <table className="min-w-full border-collapse">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Index</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Image</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Category Name</th>
+                <th className="px-4 py-3 text-center text-sm font-semibold">Actions</th>
+              </tr>
+            </thead>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => openEditModal(cat)}
-                    className="p-2 rounded bg-blue-50 text-blue-600 hover:bg-blue-100"
-                    title="Edit"
-                  >
-                    <FaEdit />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(cat)}
-                    className="p-2 rounded bg-red-50 text-red-600 hover:bg-red-100"
-                    title="Delete"
-                  >
-                    <FaTrash />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+            <tbody>
+              {categories.map((cat, index) => (
+                <tr key={cat._id} className="border-t hover:bg-gray-50">
+                  {/* SR NO */}
+                  <td className="px-4 py-3">{index + 1}</td>
+
+                  {/* IMAGE */}
+                  <td className="px-4 py-3">
+                    <div className="w-14 h-14 bg-gray-100 rounded overflow-hidden flex items-center justify-center">
+                      {cat.image ? (
+                        <img
+                          src={cat.image}
+                          alt={`${cat.name} image`}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-xs text-gray-400">No image</span>
+                      )}
+                    </div>
+                  </td>
+
+                  {/* NAME */}
+                  <td className="px-4 py-3 font-medium">{cat.name}</td>
+
+                  {/* ACTIONS */}
+                  <td className="px-4 py-3 text-center">
+                    <div className="flex justify-center gap-2">
+                      <button
+                        onClick={() => openEditModal(cat)}
+                        className="p-2 rounded bg-blue-50 text-blue-600 hover:bg-blue-100"
+                        title="Edit"
+                      >
+                        <FaEdit />
+                      </button>
+
+                      <button
+                        onClick={() => handleDelete(cat)}
+                        className="p-2 rounded bg-red-50 text-red-600 hover:bg-red-100"
+                        title="Delete"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
 
-      {/* Modal */}
+      {/* ===================== CATEGORY MODAL ===================== */}
       {showModal && (
         <CategoryModal
           onClose={() => {
@@ -176,9 +190,7 @@ const CategoryManager = () => {
 
 export default CategoryManager;
 
-/* ---------------------------------------------------------------------------
-   CategoryModal component - contains the Add/Edit form and handles saving
-   --------------------------------------------------------------------------- */
+/* ===================== CATEGORY MODAL ===================== */
 const CategoryModal = ({ onClose, editMode = false, selectedCategory = null, onSaved }) => {
   const [payload, setPayload] = useState({ name: "" });
   const [imageFile, setImageFile] = useState(null);
@@ -293,7 +305,6 @@ const CategoryModal = ({ onClose, editMode = false, selectedCategory = null, onS
               <div className="flex gap-3 items-center">
                 <div className="w-28 h-20 border rounded overflow-hidden bg-gray-50 flex items-center justify-center">
                   {previewUrl ? (
-                    // eslint-disable-next-line jsx-a11y/img-redundant-alt
                     <img src={previewUrl} alt="preview" className="w-full h-full object-cover" />
                   ) : (
                     <span className="text-xs text-gray-400">No image</span>
@@ -307,8 +318,6 @@ const CategoryModal = ({ onClose, editMode = false, selectedCategory = null, onS
               </div>
             </div>
           </div>
-
-          {/* optionally: other meta fields */}
         </div>
       </div>
     </div>
