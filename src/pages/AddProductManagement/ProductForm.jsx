@@ -276,7 +276,7 @@ const ProductForm = ({
           <InputField label="Pack Size" value={payload.pack_size} onChange={(e) => setPayload({ ...payload, pack_size: e.target.value })} error={errors.pack_size} />
           <InputField label="GST %" type="number" value={payload.gst_in_percentage} onChange={(e) => setPayload({ ...payload, gst_in_percentage: e.target.value })} />
           <InputField label="MRP" type="number" value={payload.product_mrp} onChange={(e) => setPayload({ ...payload, product_mrp: e.target.value })} error={errors.product_mrp} />
-          <InputField label="Franchisee Price" type="number" value={payload.franchisee_price} onChange={(e) => setPayload({ ...payload, franchisee_price: e.target.value })} error={errors.franchisee_price} />
+          <InputField label="Vendor Price" type="number" value={payload.franchisee_price} onChange={(e) => setPayload({ ...payload, franchisee_price: e.target.value })} error={errors.franchisee_price} />
         </div>
 
         <div>
