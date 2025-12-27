@@ -58,7 +58,7 @@ const MemberProfile = () => {
                 alt="User"
                 className="w-32 h-32 rounded-full object-cover border"
               />
-              <span className="mt-2 text-sm text-gray-600">User Image</span>
+              <span className="mt-2 text-sm text-gray-600">MR Image</span>
             </div>
 
             {/* Aadhaar Image */}
@@ -99,7 +99,7 @@ const MemberProfile = () => {
                 <td className="py-2">{data?.name}</td>
               </tr>
               <tr className="border-b">
-                <td className="py-2 font-semibold">Active User</td>
+                <td className="py-2 font-semibold">Active MR Member</td>
                 <td className="py-2">{data?.status === "approved" ? "Yes" : "No"}</td>
               </tr>
               <tr className="border-b">
