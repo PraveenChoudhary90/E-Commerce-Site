@@ -29,7 +29,7 @@ const MemberCard = (props) => {
         <div className="flex gap-3 mt-2">
           <button
             className="text-bg-color border border-bg-color text-sm rounded-lg px-4 py-1 hover:bg-bg-color hover:text-white transition-colors"
-            onClick={() => navigate(`/memberprofile/${_id}`)}
+            onClick={() => navigate(`/MR-memberprofile/${_id}`)}
           >
             VIEW PROFILE
           </button>

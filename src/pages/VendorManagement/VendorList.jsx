@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaRegEye } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { getSellerListToVerify } from "../../api/auth-api";
+import { getSellerListToVerify, toggleVendorBlockStatus } from "../../api/auth-api";
 import PageLoader from "../../components/ui/PageLoader";
 import SelectComponent from "../../components/SelectComponent";
 import Swal from "sweetalert2";
@@ -339,17 +339,41 @@ const VendorList = ({ tittle }) => {
 
   /* Navigate */
   const handleNavigateToVendorDetails = (item) => {
-     if (item.kycStatus === "approved" || item.kycStatus === "rejected") {
-      Swal.fire({
-        icon: "info",
-        title: "Action Restricted",
-        text: "You have already worked on it.",
-        confirmButtonColor: "#16a34a",
-      });
-      return;
-    }
     navigate(`/franchisee-details/${item._id}`, { state: item });
   };
+
+
+const handleToggleBlock = async (item) => {
+  try {
+    setIsLoading(true);
+
+    const vendorId = item.vendor._id;
+    const updatedVendor = await toggleVendorBlockStatus(vendorId, !item.isBlocked);
+
+    // Update local state correctly
+    setSellerList((prev) =>
+      prev.map((v) =>
+        v._id === item._id
+          ? { ...v, isBlocked: !v.isBlocked } // toggle locally
+          : v
+      )
+    );
+
+    Swal.fire(
+      "Success!",
+      `Vendor has been ${item.isBlocked ? "unblocked" : "blocked"}.`,
+      "success"
+    );
+  } catch (err) {
+    console.error(err);
+    Swal.fire("Error!", "Something went wrong.", "error");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+
+
 
   return (
     <>
@@ -420,6 +444,7 @@ const VendorList = ({ tittle }) => {
                   <th className="border p-2">Vendor ID</th>
                   <th className="border p-2">Company</th>
                   <th className="border p-2">KYC Status</th>
+                  <th className="border p-2">Status</th>
                   <th className="border p-2">Action</th>
                 </tr>
               </thead>
@@ -443,6 +468,22 @@ const VendorList = ({ tittle }) => {
                     >
                       {item.kycStatus}
                     </td>
+
+
+<td className="border p-2 text-center">
+  <button
+    onClick={() => handleToggleBlock(item)}
+    className={`px-3 py-1 rounded font-medium text-white ${
+      item.isBlocked ? "bg-red-600" : "bg-green-600"
+    }`}
+  >
+    {item.isBlocked ? "Unblock" : "Block"}
+  </button>
+</td>
+
+
+
+
                     <td className="border p-2 text-center">
                       <button
                         onClick={() => handleNavigateToVendorDetails(item)}

@@ -98,6 +98,18 @@ export async function getSellerListToVerify() {
   return response?.data;
 }
 
+
+export async function toggleVendorBlockStatus(vendorId, isBlocked) {
+  const response = await Axios.put(`${apiUrl}/auth/vendorblock/${vendorId}`, {
+    isBlocked,
+  });
+  return response?.data; // return updated vendor info
+}
+
+
+
+
+
 export async function getSellerById(id) {
   const response = await Axios.get(`${apiUrl}/get-seller-by-id/${id}`);
   return response?.data;

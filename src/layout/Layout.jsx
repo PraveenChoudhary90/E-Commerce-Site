@@ -66,12 +66,12 @@ const Layout = () => {
             label: "Order Details",
             icon: <MdOutlineBorderAll />,
         },
-        {
-            path:Routers.ProductDisplay,
-            label:"Manage All Product",
-            icon: <FaProductHunt />,
+        // {
+        //     path:Routers.ProductDisplay,
+        //     label:"Manage All Product",
+        //     icon: <FaProductHunt />,
 
-        },
+        // },
         // {
         //     path: Routers.CATEGORY_MANAGMENT,
         //     label: "All Category List",

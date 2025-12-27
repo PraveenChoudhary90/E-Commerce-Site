@@ -56,7 +56,7 @@ const ManageMemberHead = () => {
       {!loading && (
         <>
           <MemberBannerPart
-            heading="Manage Members"
+            heading="MR Manage Members"
             btnTitle="Add Member"
             onClose={togglePopup}
           />

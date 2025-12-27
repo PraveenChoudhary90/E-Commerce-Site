@@ -39,7 +39,7 @@ const MemberProfile = () => {
       <div className="flex flex-col gap-6">
         <MemberBannerPart
           onClick={togglePopup}
-          heading={"Member Profile"}
+          heading={"MR Member Profile"}
           btnTitle={"Overview"}
           name={data?.name}
           email={data?.email}
