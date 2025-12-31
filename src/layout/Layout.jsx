@@ -5,6 +5,7 @@ import { FaBaseballBall, FaHome, FaSignOutAlt } from "react-icons/fa";
 import { IoIosNotifications, IoIosNotificationsOutline } from "react-icons/io";
 import { MainContent } from "../constants/mainContent";
 import { IoSettings } from "react-icons/io5";
+import { CiWallet } from "react-icons/ci";
 import {
     MdContentPasteGo,
     MdManageAccounts,
@@ -82,6 +83,11 @@ const Layout = () => {
             label: "Inventory Report",
             icon: <MdOutlineInventory />,
         },
+            { path: Routers.AllIncome,
+                 label: "All Income",
+                 icon: <CiWallet />,
+                  },
+        
         
         {
             path: "/marketing-tool",

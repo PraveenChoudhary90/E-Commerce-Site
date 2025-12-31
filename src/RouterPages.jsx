@@ -38,6 +38,7 @@ import ReferralManagement from "./pages/ReferralManagement";
 import GalleryManagement from "./pages/GalleryManagement/GalleryManagement";
 import OrderHistory from "./pages/OrderDetailPage";
 import ProductCard from "./pages/AllProductDataAdd";
+import MyIncome from "./MyIncome";
 // import CategoryList from "./pages/AddProductManagement/CategoryList";
 //import CategoryList from "./pages/AddProductManagement/CategoryList";
 
@@ -105,6 +106,7 @@ const RoutersPages = () => {
               <Route path={Routers.ManageMembers} element={<ManageMembers />} />
               <Route path={Routers.MembersProfile} element={<MemberProfile />} />
               <Route path={Routers.AddProduct} element={<AddProduct />} />
+              <Route path={Routers.AllIncome} element={<MyIncome/>}/>
                <Route path={Routers.AddCategories} element={<AddCategories />} /> 
               <Route path={Routers.AddCategoryType} element={<AddCategoryTypes />} />
               <Route path={Routers.AddCategoryBrand} element={<AddCategoryBrand />} />

@@ -45,5 +45,6 @@ export const Routers = {
   REFERRAL_MANAGEMENT: "/referral-management",
   GALLERY_MANAGEMENT: "/gallery-management",
   HISTORY:"/order-history",
-  ProductDisplay:"/ProductDisplay"
+  ProductDisplay:"/ProductDisplay",
+  AllIncome:"/All-Income"
 };
