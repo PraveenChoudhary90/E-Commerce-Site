@@ -152,7 +152,7 @@ const invoiceRef = useRef(null);
       <div className="flex justify-end p-4 gap-3 bg-gray-50 border-b rounded-t-lg sticky top-0 z-10 no-print">
         <button
           onClick={handleDownloadPDF}
-          className="bg-[#8e6d9d] text-white px-5 py-2 rounded shadow hover:bg-[#7a5b88] font-medium"
+          className="bg-[#085946] text-white px-5 py-2 rounded shadow hover:bg-[#085946] font-medium"
         >
           Download PDF
         </button>
@@ -168,24 +168,24 @@ const invoiceRef = useRef(null);
       <div ref={invoiceRef} className="bg-white p-0 text-gray-800">
         
         {/* Header */}
-        <div className="bg-[#8e6d9d] p-10 flex justify-between items-start text-white">
+        <div className="bg-[#085946] p-10 flex justify-between items-start text-white">
           <div>
             <h1 className="text-3xl font-black uppercase tracking-tighter">
-              BIONOVA HEALTHCARE PVT LTD
+              PHARAMA SATTI PVT LTD
             </h1>
             <div className="text-sm mt-3 space-y-1 opacity-90 font-medium">
               <p>Plot No. 123, Industrial Area, Phase-1</p>
               <p>Bhopal, Madhya Pradesh, India - 462001</p>
-              <p>Email: info@bionovahealthcare.com</p>
+              <p>Email: info@pharamasatti.com</p>
               <p>GSTIN: 23AAACB1234A1Z5</p>
             </div>
           </div>
           
-          <div className="bg-white p-4 rounded-md flex flex-col items-center border-2 border-[#a68bb3]">
+          <div className="bg-white p-4 rounded-md flex flex-col items-center border-2 border-[#085946]">
             <span className="text-[10px] text-gray-400 uppercase font-bold">Logo</span>
             <div className="flex items-center gap-2">
-              <div className="bg-[#8e6d9d] text-white rounded-full w-8 h-8 flex items-center justify-center text-xl font-bold italic">B</div>
-              <span className="text-[#8e6d9d] font-black text-2xl italic">Bionova</span>
+              <div className="bg-[#085946] text-white rounded-full w-8 h-8 flex items-center justify-center text-xl font-bold italic">P</div>
+              <span className="text-[#085946] font-black text-2xl italic">Pharama Satti</span>
             </div>
           </div>
         </div>
@@ -219,7 +219,7 @@ const invoiceRef = useRef(null);
           {/* Product Table */}
           <table className="w-full border-collapse mb-8 overflow-hidden rounded-t-lg">
             <thead>
-              <tr className="bg-[#8e6d9d] text-white text-[11px]">
+              <tr className="bg-[#085946] text-white text-[11px]">
                 <th className="p-4 text-left uppercase">Product & Description</th>
                 <th className="p-4 text-center uppercase">Qty</th>
                 <th className="p-4 text-right uppercase">Price</th>
@@ -246,15 +246,15 @@ const invoiceRef = useRef(null);
           {/* Summary */}
           <div className="flex justify-between items-end">
             <div className="w-2/3">
-              <h3 className="text-xl font-bold text-[#8e6d9d] italic leading-tight">
+              <h3 className="text-xl font-bold text-[#085946] italic leading-tight">
                 Thank you for your business!
               </h3>
               <p className="text-sm text-gray-500 mt-1">
-                We appreciate your trust in Bionova Healthcare.
+                We appreciate your trust in Pharama satti.
               </p>
             </div>
             <div className="w-72">
-              <div className="flex justify-between p-4 bg-[#8e6d9d] text-white font-black text-xl shadow-lg mt-2 rounded-sm">
+              <div className="flex justify-between p-4 bg-[#085946] text-white font-black text-xl shadow-lg mt-2 rounded-sm">
                 <span className="text-xs uppercase pt-2 font-bold">Total Paid</span>
                 <span>₹{selectedOrder.totalAmount?.toFixed(2)}</span>
               </div>
@@ -267,7 +267,7 @@ const invoiceRef = useRef(null);
               <h4 className="font-bold text-xs uppercase text-gray-500 mb-3 border-b pb-1">Payment Information</h4>
               <div className="text-[11px] space-y-1 text-gray-600">
                 <p><strong>Bank:</strong> State Bank of India</p>
-                <p><strong>A/c Name:</strong> Bionova Healthcare Pvt Ltd</p>
+                <p><strong>A/c Name:</strong> Pharama Satti Pvt Ltd</p>
                 <p><strong>A/c No:</strong> 334455667788</p>
                 <p><strong>IFSC:</strong> SBIN0001234</p>
               </div>

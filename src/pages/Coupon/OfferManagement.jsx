@@ -21,7 +21,7 @@ const OfferManagement = () => {
             {activeTab === index && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute inset-0 bg-[#702F8A] rounded-lg z-0"
+                className="absolute inset-0 bg-[#085946] rounded-lg z-0"
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               />
             )}

@@ -50,7 +50,7 @@ const ProductManagement = () => {
         },
         {
             type: "Pill",
-            brand: "Bionova Healthcare Limited",
+            brand: "Pharama Satti Private Limited",
             names: ["INH AIRFLOW 250", "Galaxy 250"],
         },
         {

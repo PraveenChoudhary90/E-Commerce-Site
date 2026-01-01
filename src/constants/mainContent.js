@@ -1,8 +1,8 @@
 import axios from "axios";
-import logo from "../assets/images/logo.png";
+import logo from "../assets/images/pharma-logo.png";
 
 export const MainContent = {
-  name: "Bionova",
+  name: "Pharama Satti",
   logo: logo,
 };
 export const backendConfig = {

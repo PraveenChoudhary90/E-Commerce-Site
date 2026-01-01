@@ -273,7 +273,7 @@ export default function RewardManagementForm() {
             {activeTab === index && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute inset-0 bg-[#702F8A] rounded-lg z-0"
+                className="absolute inset-0 bg-[#085946] rounded-lg z-0"
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               />
             )}
@@ -324,7 +324,7 @@ export default function RewardManagementForm() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`mt-4 bg-[#702F8A] text-white px-4 py-2 rounded-lg w-full ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                className={`mt-4 bg-[#085946] text-white px-4 py-2 rounded-lg w-full ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
               >
                 {loading ? 'Saving...' : 'Save'}
               </button>
@@ -363,7 +363,7 @@ export default function RewardManagementForm() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`mt-4 bg-[#702F8A] text-white px-4 py-2 rounded-lg w-full ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                className={`mt-4 bg-[#085946] text-white px-4 py-2 rounded-lg w-full ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
               >
                 {loading ? 'Saving...' : 'Save'}
               </button>
@@ -408,7 +408,7 @@ export default function RewardManagementForm() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`mt-4 bg-[#702F8A] text-white px-4 py-2 rounded-lg w-full ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                className={`mt-4 bg-[#085946] text-white px-4 py-2 rounded-lg w-full ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
               >
                 {loading ? 'Saving...' : 'Save'}
               </button>

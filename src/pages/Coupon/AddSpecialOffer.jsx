@@ -52,7 +52,7 @@ const AddSpecialOffer = () => {
                     <h2 className="md:text-xl text-lg font-medium text-center">
                         Available Special Offers
                     </h2>
-                    <Button className="py-3" title="Create new Special Offers" onClick={() => setShowCouponForm(!showCouponForm)} />
+                    <Button className="py-3 bg-[#085946] !text-white hover:bg-[#064f3d]" title="Create new Special Offers" onClick={() => setShowCouponForm(!showCouponForm)} />
                 </div>
                     {showCouponForm && (
                         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">

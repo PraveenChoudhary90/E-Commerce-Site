@@ -102,97 +102,92 @@ export default function ReferralManagement() {
   return (
     <>
       {loading && <PageLoader />}
-      <div className="p-4 col-span-1 flex flex-col md:flex-row gap-6 items-start justify-between">
-        {/* Referral Percentages */}
-        <div className="flex flex-col gap-6 w-full md:w-1/2 p-4 bg-purple-50 rounded-xl shadow-lg">
-          <h2 className=" text-2xl font-bold text-purple-700">
-            LEVEL INCOME
-          </h2>
+     <div className="p-4 col-span-1 flex flex-col md:flex-row gap-6 items-start justify-between">
+  {/* Referral Percentages */}
+  <div className="flex flex-col gap-6 w-full md:w-1/2 p-4 bg-[#085946]/10 rounded-xl shadow-lg">
+    <h2 className="text-2xl font-bold text-[#085946]">LEVEL INCOME</h2>
 
-          <div className="flex gap-3 flex-wrap justify-between items-center">
-            <select
-              value={level}
-              onChange={(e) => setLevel(Number(e.target.value))}
-              className="border border-purple-300 rounded-lg p-2 text-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-400 w-1/3"
-            >
-              {[...Array(maxLevel)].map((_, i) => (
-                <option key={i + 1} value={i + 1}>
-                  Level {i + 1}
-                </option>
-              ))}
-            </select>
+    <div className="flex gap-3 flex-wrap justify-between items-center">
+      <select
+        value={level}
+        onChange={(e) => setLevel(Number(e.target.value))}
+        className="border border-[#085946] rounded-lg p-2 text-[#085946] focus:outline-none focus:ring-2 focus:ring-[#085946] w-1/3"
+      >
+        {[...Array(maxLevel)].map((_, i) => (
+          <option key={i + 1} value={i + 1}>
+            Level {i + 1}
+          </option>
+        ))}
+      </select>
 
-            <InputField
-              type="number"
-              value={percentage}
-              onChange={(e) => setPercentage(Number(e.target.value))}
-              className="border border-purple-300 rounded-lg p-2 w-1/3 focus:outline-none focus:ring-2 focus:ring-purple-400"
-              placeholder="Enter %"
-            />
+      <InputField
+        type="number"
+        value={percentage}
+        onChange={(e) => setPercentage(Number(e.target.value))}
+        className="border border-[#085946] rounded-lg p-2 w-1/3 focus:outline-none focus:ring-2 focus:ring-[#085946]"
+        placeholder="Enter %"
+      />
 
-            <Button
-              title="Add"
-              onClick={handleAdd}
-              className="bg-purple-600 hover:bg-purple-700 text-white rounded-lg px-4 py-2 text-sm shadow-md"
-            />
+      <Button
+        title="Add"
+        onClick={handleAdd}
+        className="bg-[#085946] hover:bg-[#064f3d] text-white rounded-lg px-4 py-2 text-sm shadow-md"
+      />
 
-            <Button
-              title="Add Level +"
-              onClick={handleAddLevel}
-              className="bg-purple-100 text-purple-700 font-semiboldadow-sm"
-            />
-          </div>
+      <Button
+        title="Add Level +"
+        onClick={handleAddLevel}
+        className="bg-[#085946]/20 text-[#085946] font-semibold shadow-sm"
+      />
+    </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse border border-purple-200 rounded-lg overflow-hidden">
-              <thead>
-                <tr className="bg-purple-100 text-purple-700">
-                  <th className="border border-purple-200 p-2 text-sm">LEVEL</th>
-                  <th className="border border-purple-200 p-2 text-sm">PERCENTAGE (%)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Array.from({ length: maxLevel }, (_, i) => {
-                  const lvl = i + 1;
-                  return (
-                    <tr key={lvl} className="even:bg-purple-50">
-                      <td className="border border-purple-200 p-2 text-center text-purple-700 font-semibold flex items-center justify-center gap-2">
-                        Level {lvl}
-                        {lvl > 10 && (
-                          <button
-                            onClick={() => handleDeleteLevel(lvl)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <FaTrash />
-                          </button>
-                        )}
-                      </td>
-                      <td className="border border-purple-200 p-2 text-center text-purple-600 font-medium">
-                        {levels[lvl] != null ? `${levels[lvl]}%` : "-"}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse border border-[#085946]/30 rounded-lg overflow-hidden">
+        <thead>
+          <tr className="bg-[#085946]/20 text-[#085946]">
+            <th className="border border-[#085946]/30 p-2 text-sm">LEVEL</th>
+            <th className="border border-[#085946]/30 p-2 text-sm">PERCENTAGE (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Array.from({ length: maxLevel }, (_, i) => {
+            const lvl = i + 1;
+            return (
+              <tr key={lvl} className="even:bg-[#085946]/10">
+                <td className="border border-[#085946]/30 p-2 text-center text-[#085946] font-semibold flex items-center justify-center gap-2">
+                  Level {lvl}
+                  {lvl > 10 && (
+                    <button
+                      onClick={() => handleDeleteLevel(lvl)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <FaTrash />
+                    </button>
+                  )}
+                </td>
+                <td className="border border-[#085946]/30 p-2 text-center text-[#085946]/80 font-medium">
+                  {levels[lvl] != null ? `${levels[lvl]}%` : "-"}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
 
-          <div className="flex justify-center">
-            <Button
-              title="Save Referral Percentages"
-              onClick={handleSubmit}
-              disabled={loading}
-              className="bg-purple-600 hover:bg-purple-700 text-white rounded-lg px-6 py-2 text-base shadow-md"
-            />
-          </div>
-        </div>
-        {/* End Referral Percentages */}
+    <div className="flex justify-center">
+      <Button
+        title="Save Referral Percentages"
+        onClick={handleSubmit}
+        disabled={loading}
+        className="bg-[#085946] hover:bg-[#064f3d] text-white rounded-lg px-6 py-2 text-base shadow-md"
+      />
+    </div>
+  </div>
+  {/* End Referral Percentages */}
 
-        {/* <div className="w-full md:1/2"> */}
-        <SettingsForm />
-        {/* </div> */}
-
-      </div>
+  <SettingsForm />
+</div>
     </>
   );
 }

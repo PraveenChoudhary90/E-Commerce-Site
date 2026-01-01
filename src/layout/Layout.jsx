@@ -283,7 +283,7 @@ const Layout = () => {
                         <div className="p-4 flex justify-between items-center text-center font-medium text-xl">
                             <img
                                 src={MainContent.logo}
-                                alt="Bionova Logo"
+                                alt="Pharama Logo"
                                 className="w-[200px] h-auto"
                             />
                         </div>

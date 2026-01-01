@@ -50,7 +50,7 @@ const AddCoupon = () => {
           <h2 className=" md:text-xl text-lg font-medium text-center">
             Available Coupons
           </h2>
-          <Button className="py-3" title="Create new coupon" onClick={() => setShowCouponForm(!showCouponForm)} />
+          <Button className="py-3 bg-[#085946] !text-white hover:bg-[#064f3d]" title="Create new coupon" onClick={() => setShowCouponForm(!showCouponForm)} />
         </div>
         
           {showCouponForm && (

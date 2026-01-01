@@ -94,7 +94,7 @@ export default function AddProductManagement() {
               {activeTab === index && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute inset-0 bg-[#702F8A] rounded-lg"
+                  className="absolute inset-0 bg-[#085946] rounded-lg"
                   transition={{
                     type: "spring",
                     stiffness: 300,

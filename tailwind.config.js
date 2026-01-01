@@ -8,7 +8,7 @@ export default {
   theme: {
   	extend: {
   		colors: {
-  			'bg-color': '#702F8A',
+  			'bg-color': '#085946',
   			'bg-color1': '#F5F5F6',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
