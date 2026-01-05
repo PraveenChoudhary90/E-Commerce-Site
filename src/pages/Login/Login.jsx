@@ -120,7 +120,7 @@ const Login = () => {
                 <div className="flex items-center justify-between bg-[#fbfdfe] rounded-md border border-input">
                   <FormControl>
                     <Input
-                      placeholder="example@bionova.com"
+                      placeholder="example@pharamasatti.com"
                       {...form.register("email")}
                       className="bg-transparent border-none outline-none shadow-none focus-visible:ring-0"
                     />

@@ -59,10 +59,10 @@ const VendorRegister = () => {
                 <div className='flex items-center justify-between'>
                     <img
                         src={MainContent.logo}
-                        alt="Bionova Logo"
+                        alt="Pharama Logo"
                         className="md:w-[160px] w-[100px] h-auto"
                     />
-                    <h1 className='md:text-2xl sm:text-xl font-medium text-bg-color'>Register as Franchisee</h1>
+                    <h1 className='md:text-2xl sm:text-xl font-medium text-bg-color'>Register as Vendor</h1>
                 </div>
 
                 <div className='after:absolute after:top-0 after:w-full after:hidden md:after:block after:h-20 after:bg-bg-color after:rounded-xl relative'>
@@ -73,13 +73,13 @@ const VendorRegister = () => {
                         <div className='w-full bg-white rounded-xl p-6'>
                             <section className="">
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    <Input label="Franchisee Name*" name="vendorName" value={formData.vendorName} onChange={handleInputChange} placeholder="Enter Franchisee Name" />
+                                    <Input label="Vendor Name*" name="vendorName" value={formData.vendorName} onChange={handleInputChange} placeholder="Enter Franchisee Name" />
                                     <Input type="file" label="Upload Aadhar Card*" />
                                     <Input type="file" label="Upload PAN*" />
                                     <Input label="Primary Contact Number*" name="primaryContact" value={formData.primaryContact} onChange={handleInputChange} placeholder="Primary Contact Number" />
                                     <Input label="Secondary Contact Number*" name="secondaryContact" value={formData.secondaryContact} onChange={handleInputChange} placeholder="Secondary Contact Number" />
                                     <Input label="Email*" name="email" value={formData.email} onChange={handleInputChange} placeholder="Enter Email" />
-                                    <Input label="Designation of Franchisee*" name="designation" value={formData.designation} onChange={handleInputChange} placeholder="Enter Designation" />
+                                    <Input label="Designation of Vendor*" name="designation" value={formData.designation} onChange={handleInputChange} placeholder="Enter Designation" />
                                     <Select label="Country*" name="country" options={["Choose", "India"]} value={formData.country} onChange={handleInputChange} />
                                     <Input label="State*" name="state" value={formData.state} onChange={handleInputChange} placeholder="Enter State" />
                                     <Input label="City*" name="city" value={formData.city} onChange={handleInputChange} placeholder="Enter City" />

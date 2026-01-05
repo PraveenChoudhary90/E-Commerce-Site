@@ -156,10 +156,10 @@ const VendorManagementForm = () => {
           {/* general details section */}
           <Section title="General Details">
             <InputField
-              label="Franchisee Name*"
+              label="Vendor Name*"
               name="vendorName"
               value={formData.vendorName}
-              placeholder="Enter Franchisee Name"
+              placeholder="Enter Vendor Name"
             />
             <InputField
               disabled
@@ -208,7 +208,7 @@ const VendorManagementForm = () => {
             />
             <InputField
               disabled
-              label="Designation of Franchisee*"
+              label="Designation of Vendor*"
               name="designation"
               value={formData.designation}
             />
@@ -337,17 +337,17 @@ const VendorManagementForm = () => {
         {formData.kycStatus === "pending" && (
           <div className="flex items-center gap-3 justify-center">
             <Button
-              title={"Approve Franchisee"}
+              title={"Approve Vendor"}
               bgcolor={"bg-[#32C98D]"}
               onClick={() => StatusHandler("approved")}
             />
             <Button
-              title={"Reject Franchisee"}
+              title={"Reject Vendor"}
               bgcolor={"bg-[#DF7272]"}
               onClick={() => StatusHandler("rejected")}
             />
             <Button
-              title={"Hold Franchisee"}
+              title={"Hold Vendor"}
               bgcolor={"bg-[#EEA81F]"}
               onClick={() => StatusHandler("pending")}
             />

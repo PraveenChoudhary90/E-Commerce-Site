@@ -36,6 +36,15 @@ export async function getOrderDetails() {
 }
 
 
+export const getIncomeOrdersByAdmin = async () => {
+  const res = await Axios.get(`${apiUrl}/income/AdminallIncomeorder`);
+  return res.data;
+};
+
+
+
+
+
 export async function getCategories() {
   const response = await Axios.get(`${apiUrl}/get-product-details`);
   return response?.data;
