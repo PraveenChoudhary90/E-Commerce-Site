@@ -82,21 +82,27 @@ const CategoryManager = () => {
     <div className="p-6">
       {fetching && <PageLoader />}
 
-      <div className="flex justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Categories</h1>
+     <div className="flex flex-col sm:flex-row justify-between mb-6 gap-2 sm:gap-0">
+  <h1 className="text-2xl font-semibold">Categories</h1>
 
-        <div className="flex items-center gap-2">
-          <Button title="Refresh" onClick={loadCategories} bgcolor="bg-gray-200" />
-          <Button
-            title="Add Category"
-            bgcolor="bg-[#32C98D]"
-            className="flex items-center gap-2"
-            onClick={openAddModal}
-          >
-            <FaPlus />
-          </Button>
-        </div>
-      </div>
+  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+    <Button 
+      title="Refresh" 
+      onClick={loadCategories} 
+      bgcolor="bg-gray-200" 
+      className="w-full sm:w-auto"
+    />
+    <Button
+      title="Add Category"
+      bgcolor="bg-[#32C98D]"
+      className="flex items-center gap-2 w-full sm:w-auto justify-center"
+      onClick={openAddModal}
+    >
+      <FaPlus />
+    </Button>
+  </div>
+</div>
+
 
       {/* ===================== TABLE VIEW ===================== */}
       <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
