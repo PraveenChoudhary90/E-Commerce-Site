@@ -1,5 +1,5 @@
 import React from "react";
-import backgroundImage from "../../assets/manageMembers/Background.png";
+import backgroundImage from "../../assets/manageMembers/Backgroundimg.jpeg";
 import defaultProfile from "../../assets/manageMembers/defaultProfile.png";
 import Button from "../../components/Button";
 import { FaPencil } from "react-icons/fa6";

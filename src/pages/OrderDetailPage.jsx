@@ -79,7 +79,7 @@ const OrderHistory = () => {
                 <tr className="bg-gray-200 text-center">
                   <th className="border px-4 py-2">Index</th>
                   <th className="border px-4 py-2">Vendor Name</th>
-                  <th className="border px-4 py-2">Email</th>
+                  <th className="border px-4 py-2">Vednor Email</th>
                   <th className="border px-4 py-2">Phone</th>
                   <th className="border px-4 py-2">Address</th>
                   <th className="border px-4 py-2">Payment Type</th>
