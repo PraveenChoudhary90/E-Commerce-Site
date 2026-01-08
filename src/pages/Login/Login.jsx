@@ -105,7 +105,7 @@ const Login = () => {
       >
         <div className="w-full md:w-2/6 py-10 p-4 bg-[#ffffff6a] backdrop-blur-md rounded-3xl border shadow-[0_0_10px_rgba(0,0,0,0.1)] flex flex-col items-center">
           <div className="flex justify-center mb-6">
-            <img src={MainContent.logo} alt="Bionova Logo" className="w-[200px] h-auto" />
+            <img src={MainContent.logo} alt="Pharama Logo" className="w-[200px] h-auto" />
           </div>
           <p className="uppercase text-center text-sm md:text-base font-semibold mx-auto break-words text-ellipsis">
             India&apos;s first B2B medi-commerce platform

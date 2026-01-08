@@ -147,6 +147,10 @@ const MemberProfile = () => {
                 <td className="py-2 font-semibold">PAN Number</td>
                 <td className="py-2">{data?.panNumber || "N/A"}</td>
               </tr>
+              <tr className="border-b">
+                <td className="py-2 font-semibold">Aadhar Number</td>
+                <td className="py-2">{data?.aadhaarNumber || "N/A"}</td>
+              </tr>
               <tr>
                 <td className="py-2 font-semibold">Location</td>
                 <td className="py-2">India</td>
