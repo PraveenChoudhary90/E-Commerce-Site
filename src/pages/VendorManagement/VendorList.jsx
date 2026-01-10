@@ -339,7 +339,7 @@ const VendorList = ({ tittle }) => {
 
   /* Navigate */
   const handleNavigateToVendorDetails = (item) => {
-    navigate(`/franchisee-details/${item._id}`, { state: item });
+    navigate(`/vendor-details/${item._id}`, { state: item });
   };
 
 

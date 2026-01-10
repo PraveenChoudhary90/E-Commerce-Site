@@ -11,6 +11,7 @@
     background-color: #1c1d1f6a;
 }
 
+
 @-moz-keyframes whirly-loader {
     0% {
       -moz-transform: rotate(0deg);
