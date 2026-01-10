@@ -3,6 +3,7 @@ import { getOrderDetails } from "../api/auth-api";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import PageLoader from "../components/ui/PageLoader";
 
 const OrderHistory = () => {
   const [filter, setFilter] = useState("all");
@@ -50,6 +51,16 @@ const OrderHistory = () => {
     pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
     pdf.save(`Invoice_${selectedOrder._id.slice(-6)}.pdf`);
   };
+
+
+
+
+
+
+  if (loading) {
+  return <PageLoader />;
+}
+
 
   return (
     <>

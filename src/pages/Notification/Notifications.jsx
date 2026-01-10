@@ -1,10 +1,13 @@
 import { useEffect, useState, useRef } from "react";
 import { Send, XCircle, Eye } from "lucide-react";
 import { closeSupport, getAllSupports, replySupport } from "../../api/auth-api";
+import PageLoader from "../../components/ui/PageLoader";
+
 
 const AdminSupportChat = () => {
   const [supports, setSupports] = useState([]);
   const [activeTicket, setActiveTicket] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [reply, setReply] = useState("");
   const chatEndRef = useRef(null);
 
@@ -35,6 +38,11 @@ const AdminSupportChat = () => {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeTicket]);
+
+
+
+
+  if (loading) return <PageLoader />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 to-indigo-100 flex justify-center items-start pt-10 p-4">
