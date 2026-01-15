@@ -207,7 +207,7 @@ const TableComponent = ({ tittle, data = [] }) => {
                    
                     <th className="border border-gray-300 p-2 font-medium">Pack Size</th>
                     <th className="border border-gray-300 p-2 font-medium">MRP (Rs)</th>
-                    <th className="border border-gray-300 p-2 font-medium">Franchisee Price (Rs)</th>
+                    <th className="border border-gray-300 p-2 font-medium">Vendor Price (Rs)</th>
                     <th className="border border-gray-300 p-2 font-medium">Discount Percentage (%)</th>
                     <th className="border border-gray-300 p-2 font-medium">Action</th>
                     <th className="border border-gray-300 p-2 font-medium">Status</th>

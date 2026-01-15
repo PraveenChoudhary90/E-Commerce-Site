@@ -215,7 +215,7 @@ const AddMemberPopup = ({ onClose, onSuccess, editMode = false, data = {} }) => 
             </form>
           </div>
 
-          <div className="sticky bottom-0 bg-white py-3 text-center border-t mt-2">
+          <div className="sticky bottom-0 bg-white py-3 text-center border-t mt-2 text-white">
             <Button title={editMode ? "Update" : "Create Member"} onClick={handleAdd} className="w-full md:w-1/3 m-auto py-3" />
           </div>
         </div>

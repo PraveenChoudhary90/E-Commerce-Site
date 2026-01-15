@@ -340,7 +340,7 @@ const ProductForm = ({
           </div>
         </div>
 
-        <div className="flex gap-4 mt-5">
+        <div className="flex gap-4 mt-5 text-white">
           <Button title={isEditMode ? "Update Product" : "Add Product"} onClick={handleSubmit} />
           <Button title="Reset" type="button" onClick={handleReset} />
         </div>
