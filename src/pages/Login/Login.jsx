@@ -1,5 +1,5 @@
 import { useState } from "react";
-import img from "../../assets/images/login1.png";
+import img from "../../assets/images/login11.png";
 import { MainContent } from "../../constants/mainContent";
 import { AiOutlineLock, AiOutlineMail, AiOutlineUnlock } from "react-icons/ai";
 import { Input } from "../../components/ui/input";
