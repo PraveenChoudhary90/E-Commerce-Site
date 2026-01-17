@@ -80,12 +80,20 @@ const MyIncome = () => {
         <p className="text-gray-500 text-sm">Admin – All Income Records</p>
       </div>
 
-      {/* SUMMARY CARDS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <SummaryCard title="Total Income" value={totalIncome.toFixed(2)} icon={<Wallet />} color="bg-[#1E74C5]" />
-        <SummaryCard title="Monthly Earnings" value={monthlyEarnings.toFixed(2)} icon={<Briefcase />} color="bg-[#47A1E5]" />
-        <SummaryCard title="Level Income" value={referralBonus.toFixed(2)} icon={<Gift />} color="bg-[#8E6AD1]" />
-      </div>
+     {/* SUMMARY CARDS */}
+{/* grid-cols-1: Mobile pe ek ke niche ek
+  md:grid-cols-2: 768px (Tablet) pe do cards upar
+  lg:grid-cols-3: 1024px+ pe teeno ek line mein
+*/}
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+  <SummaryCard title="Total Income" value={totalIncome.toFixed(2)} icon={<Wallet />} color="bg-[#1E74C5]" />
+  <SummaryCard title="Monthly Earnings" value={monthlyEarnings.toFixed(2)} icon={<Briefcase />} color="bg-[#47A1E5]" />
+  
+  {/* Ye div 768px pe full width le lega (2 columns), lekin 1024px pe normal 1 column ho jayega */}
+  <div className="md:col-span-2 lg:col-span-1">
+    <SummaryCard title="Level Income" value={referralBonus.toFixed(2)} icon={<Gift />} color="bg-[#8E6AD1]" />
+  </div>
+</div>
 
       {/* FILTERS */}
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8 flex flex-wrap items-end gap-6">
@@ -253,12 +261,17 @@ const MyIncome = () => {
   );
 };
 
+
+
+{/* Updated SummaryCard Component */}
 const SummaryCard = ({ title, value, icon, color }) => (
-  <div className={`${color} p-6 rounded-xl text-white flex items-center gap-4`}>
-    <div className="bg-white/20 p-3 rounded-lg">{icon}</div>
-    <div>
-      <p className="text-sm opacity-90">{title}</p>
-      <h2 className="text-2xl font-bold">₹{value.toLocaleString()}</h2>
+  <div className={`${color} p-6 rounded-xl text-white flex items-center gap-4 shadow-sm`}>
+    <div className="bg-white/20 p-3 rounded-lg flex-shrink-0">
+      {icon}
+    </div>
+    <div className="min-w-0 text-left">
+      <p className="text-sm opacity-90 font-medium truncate">{title}</p>
+      <h2 className="text-2xl font-bold">₹{value}</h2>
     </div>
   </div>
 );
