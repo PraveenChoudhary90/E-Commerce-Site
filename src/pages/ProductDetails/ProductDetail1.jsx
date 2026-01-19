@@ -36,7 +36,7 @@ const ProductDetail1 = ({ productData }) => {
                 />
                 <div>
                     <label className="block text-sm font-normal text-gray-700">
-                        Combination:
+                        Product Name:
                     </label>
                     <textarea
                         name="combination"

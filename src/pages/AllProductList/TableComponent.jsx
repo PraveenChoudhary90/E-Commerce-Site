@@ -200,7 +200,7 @@ const TableComponent = ({ tittle, data = [] }) => {
                   <tr>
                     <th className="border border-gray-300 p-2 font-medium">SL</th>
                     <th className="border border-gray-300 p-2 font-medium">Image</th>
-                    <th className="border border-gray-300 p-2 font-medium">Combination</th>
+                    <th className="border border-gray-300 p-2 font-medium">Product Name</th>
                     <th className="border border-gray-300 p-2 font-medium">Category</th>
                     <th className="border border-gray-300 p-2 font-medium">Stock</th>
                     <th className="border border-gray-300 p-2 font-medium">Attributes</th>
@@ -352,7 +352,7 @@ const TableComponent = ({ tittle, data = [] }) => {
                 <strong>Product ID:</strong> {selectedProduct.productId}
               </p>
               <p>
-                <strong>Combination:</strong> {selectedProduct.combination?.split(",").join(" | ")}
+                <strong>Product Name:</strong> {selectedProduct.combination?.split(",").join(" | ")}
               </p>
               <p>
                 <strong>Category:</strong> {selectedProduct.product_category?.map((cat) => cat.name).join(", ")}
@@ -370,7 +370,7 @@ const TableComponent = ({ tittle, data = [] }) => {
                 <strong>MRP:</strong> ₹{selectedProduct.product_mrp || "-"}
               </p>
               <p>
-                <strong>Franchisee Price:</strong> ₹{selectedProduct.franchisee_price || "-"}
+                <strong>Vendor Price:</strong> ₹{selectedProduct.franchisee_price || "-"}
               </p>
               <p>
                 <strong>Discount %:</strong>{" "}
