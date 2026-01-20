@@ -54,48 +54,45 @@ const OrderHistory = () => {
     pdf.save(`Invoice_${selectedOrder._id.slice(-6)}.pdf`);
   };
 
+const handleStatusChange = async (orderId, oldStatus, newStatus) => {
+  if (oldStatus === newStatus) return;
 
+  const result = await Swal.fire({
+    title: "Confirm Status Change",
+    text: `Change order status from "${oldStatus}" to "${newStatus}"?`,
+    icon: newStatus === "CANCELED" ? "error" : "warning",
+    showCancelButton: true,
+    confirmButtonColor: newStatus === "CANCELED" ? "#d33" : "#3085d6",
+    cancelButtonColor: "#aaa",
+    confirmButtonText: "Yes, update",
+    cancelButtonText: "No",
+  });
 
-  const handleCancel = async (orderId) => {
+  if (!result.isConfirmed) return;
+
   try {
-    // Show confirmation dialog
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "Do you want to cancel this order?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, cancel it!",
-      cancelButtonText: "No, keep it"
-    });
+    await cancelOrderByAdmin(orderId, newStatus);
 
-    if (!result.isConfirmed) return;
-
-    // Call API
-    await cancelOrderByAdmin(orderId);
-
-    // Success alert
-    await Swal.fire({
-      title: "Cancelled!",
-      text: "Order has been cancelled successfully.",
-      icon: "success",
-      timer: 2000,
-      showConfirmButton: false
-    });
-
-    // Refresh orders
-    const response = await getOrderDetails();
-    setOrders(response?.data || []);
-
-  } catch (error) {
-    console.error("Error cancelling order:", error);
+    // 🔥 Frontend me orders ko update karo
+    setOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order._id === orderId ? { ...order, status: newStatus } : order
+      )
+    );
 
     Swal.fire({
-      title: "Failed!",
-      text: error.response?.data?.message || "Could not cancel order",
-      icon: "error"
+      icon: "success",
+      title: "Updated!",
+      text: `Order status changed to "${newStatus}"`,
+      timer: 1500,
+      showConfirmButton: false,
     });
+  } catch (error) {
+    Swal.fire(
+      "Error",
+      error?.response?.data?.message || "Failed to update order status",
+      "error"
+    );
   }
 };
 
@@ -143,7 +140,8 @@ const OrderHistory = () => {
                   <th className="border px-4 py-2">Total Amount (₹)</th>
                   <th className="border px-4 py-2">Products</th>
                   <th className="border px-4 py-2">Order Date</th>
-                  <th className="border px-4 py-2">Cancel Order</th>
+                  <th className="border px-4 py-2">Status</th>
+                  <th className="border px-4 py-2">Order Status</th>
                   <th className="border px-4 py-2">Actions</th>
                 </tr>
               </thead>
@@ -166,22 +164,41 @@ const OrderHistory = () => {
                     <td className="border px-4 py-2">
                       {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A"}
                     </td>
+                    <td className="border px-4 py-2">
+  <span
+    className={`px-2 py-1 rounded font-bold text-white text-sm ${
+      order.status === "PENDING"
+        ? "bg-yellow-500"
+        : order.status === "DISPATCHED"
+        ? "bg-blue-500"
+        : order.status === "SUCCESS"
+        ? "bg-green-600"
+        : order.status === "FAILED"
+        ? "bg-red-500"
+        : order.status === "CANCELED"
+        ? "bg-gray-500"
+        : "bg-gray-300"
+    }`}
+  >
+    {order.status}
+  </span>
+</td>
+
                     {/* Cancel button: only if order is not Cancelled or SUCCESS */}
-       <td className="border px-4 py-2 text-center">
-  {order.status === "SUCCESS" ? (
-    <span className="text-green-600 font-semibold text-sm">Completed</span>
-  ) : order.status === "Delivered" ? (
-    <span className="text-blue-600 font-semibold text-sm">Delivered</span>
-  ) : order.status === "Cancelled" ? (
-    <span className="text-gray-500 italic text-sm">Cancelled</span>
-  ) : (
-    <button
-      className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-      onClick={() => handleCancel(order._id)}
-    >
-      Cancel Order
-    </button>
-  )}
+      <td className="border px-4 py-2">
+  <select
+    value={order.status}
+    className="border rounded px-2 py-1 text-sm"
+    onChange={(e) =>
+      handleStatusChange(order._id, order.status, e.target.value)
+    }
+  >
+    <option value="PENDING">Pending</option>
+    <option value="DISPATCHED">Dispatched</option>
+    <option value="SUCCESS">Success (Delivered)</option>
+    <option value="FAILED">Failed</option>
+    <option value="CANCELED">Cancel</option>
+  </select>
 </td>
 
                     <td className="border px-4 py-2">

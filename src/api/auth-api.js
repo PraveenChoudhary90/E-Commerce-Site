@@ -37,8 +37,9 @@ export async function getOrderDetails() {
 
 
 
-export async function cancelOrderByAdmin(orderId){
-  const response =await Axios.put(`${apiUrl}/orders/cancel/${orderId}`)
+export async function cancelOrderByAdmin(orderId,newStatus){
+  const payload={newStatus}
+  const response =await Axios.put(`${apiUrl}/orders/status-update/${orderId}`, payload)
   return response.data;
 };
 
