@@ -36,6 +36,16 @@ export async function getOrderDetails() {
 }
 
 
+
+export async function cancelOrderByAdmin(orderId){
+  const response =await Axios.put(`${apiUrl}/orders/cancel/${orderId}`)
+  return response.data;
+};
+
+
+
+
+
 export const getIncomeOrdersByAdmin = async () => {
   const res = await Axios.get(`${apiUrl}/income/AdminallIncomeorder`);
   return res.data;

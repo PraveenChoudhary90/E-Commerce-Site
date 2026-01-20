@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
-import { getOrderDetails } from "../api/auth-api";
+import { cancelOrderByAdmin, getOrderDetails } from "../api/auth-api";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import PageLoader from "../components/ui/PageLoader";
+import Swal from "sweetalert2";
+
 
 const OrderHistory = () => {
   const [filter, setFilter] = useState("all");
@@ -54,6 +56,50 @@ const OrderHistory = () => {
 
 
 
+  const handleCancel = async (orderId) => {
+  try {
+    // Show confirmation dialog
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to cancel this order?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, cancel it!",
+      cancelButtonText: "No, keep it"
+    });
+
+    if (!result.isConfirmed) return;
+
+    // Call API
+    await cancelOrderByAdmin(orderId);
+
+    // Success alert
+    await Swal.fire({
+      title: "Cancelled!",
+      text: "Order has been cancelled successfully.",
+      icon: "success",
+      timer: 2000,
+      showConfirmButton: false
+    });
+
+    // Refresh orders
+    const response = await getOrderDetails();
+    setOrders(response?.data || []);
+
+  } catch (error) {
+    console.error("Error cancelling order:", error);
+
+    Swal.fire({
+      title: "Failed!",
+      text: error.response?.data?.message || "Could not cancel order",
+      icon: "error"
+    });
+  }
+};
+
+
 
 
 
@@ -97,6 +143,7 @@ const OrderHistory = () => {
                   <th className="border px-4 py-2">Total Amount (₹)</th>
                   <th className="border px-4 py-2">Products</th>
                   <th className="border px-4 py-2">Order Date</th>
+                  <th className="border px-4 py-2">Cancel Order</th>
                   <th className="border px-4 py-2">Actions</th>
                 </tr>
               </thead>
@@ -119,6 +166,24 @@ const OrderHistory = () => {
                     <td className="border px-4 py-2">
                       {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A"}
                     </td>
+                    {/* Cancel button: only if order is not Cancelled or SUCCESS */}
+       <td className="border px-4 py-2 text-center">
+  {order.status === "SUCCESS" ? (
+    <span className="text-green-600 font-semibold text-sm">Completed</span>
+  ) : order.status === "Delivered" ? (
+    <span className="text-blue-600 font-semibold text-sm">Delivered</span>
+  ) : order.status === "Cancelled" ? (
+    <span className="text-gray-500 italic text-sm">Cancelled</span>
+  ) : (
+    <button
+      className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+      onClick={() => handleCancel(order._id)}
+    >
+      Cancel Order
+    </button>
+  )}
+</td>
+
                     <td className="border px-4 py-2">
                       <button
                         className="text-bg-color hover:underline"
@@ -126,7 +191,8 @@ const OrderHistory = () => {
                       >
                         View Details
                       </button>
-                    </td>
+                      </td>
+                         
                   </tr>
                 ))}
               </tbody>
