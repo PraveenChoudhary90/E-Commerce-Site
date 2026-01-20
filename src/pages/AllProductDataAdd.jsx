@@ -84,11 +84,16 @@ const ProductCard = () => {
   try {
     const updatedItem = await updateItem(selectedItem._id, data);
 
-    setItems((prev) =>
-      prev.map((it) =>
-        it._id === selectedItem._id ? { ...it, ...updatedItem } : it
-      )
-    );
+    // 🔹 If API returns full updated product
+    if (updatedItem && updatedItem._id) {
+      setItems((prev) =>
+        prev.map((it) => (it._id === updatedItem._id ? updatedItem : it))
+      );
+    } else {
+      // 🔹 If API returns partial object, fetch full product
+      const res = await getCategories(); // or fetch single product API if available
+      setItems(res);
+    }
 
     setIsModalOpen(false);
     setSelectedItem(null);
@@ -100,8 +105,8 @@ const ProductCard = () => {
       timer: 1500,
       showConfirmButton: false,
     });
-
   } catch (error) {
+    console.error(error);
     Swal.fire({
       icon: "error",
       title: "Update Failed",
@@ -109,6 +114,7 @@ const ProductCard = () => {
     });
   }
 };
+
 
   // 🔹 DELETE PRODUCT
   const handleDelete = async (id) => {
