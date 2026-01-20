@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import Swal from "sweetalert2";
 import { getCategories, updateItem, deleteItem } from "../api/auth-api";
 
 const ProductCard = () => {
@@ -69,53 +70,81 @@ const ProductCard = () => {
 
   // 🔹 UPDATE PRODUCT (ImageKit supported)
   const handleUpdate = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const data = new FormData();
-    data.append("name", formData.name);
-    data.append("description", formData.description);
-    data.append("product_mrp", formData.product_mrp);
-    data.append("franchisee_price", formData.franchisee_price);
-    data.append("gst_in_percentage", formData.gst_in_percentage);
-    data.append("stock", formData.stock);
-    if (formData.image) data.append("image", formData.image);
+  const data = new FormData();
+  data.append("name", formData.name);
+  data.append("description", formData.description);
+  data.append("product_mrp", formData.product_mrp);
+  data.append("franchisee_price", formData.franchisee_price);
+  data.append("gst_in_percentage", formData.gst_in_percentage);
+  data.append("stock", formData.stock);
+  if (formData.image) data.append("image", formData.image);
 
-    try {
-      const updatedItem = await updateItem(selectedItem._id, data);
+  try {
+    const updatedItem = await updateItem(selectedItem._id, data);
 
-      // 🔹 Table ko turant update karo
-      setItems((prev) =>
-        prev.map((it) =>
-          it._id === selectedItem._id ? { ...it, ...updatedItem } : it
-        )
-      );
+    setItems((prev) =>
+      prev.map((it) =>
+        it._id === selectedItem._id ? { ...it, ...updatedItem } : it
+      )
+    );
 
-      setIsModalOpen(false);
-      setSelectedItem(null);
-      setFormData({
-        name: "",
-        description: "",
-        product_mrp: "",
-        franchisee_price: "",
-        gst_in_percentage: "",
-        stock: "",
-        image: null,
-      });
-    } catch (error) {
-      console.error("Update error:", error);
-    }
-  };
+    setIsModalOpen(false);
+    setSelectedItem(null);
+
+    Swal.fire({
+      icon: "success",
+      title: "Updated!",
+      text: "Product updated successfully.",
+      timer: 1500,
+      showConfirmButton: false,
+    });
+
+  } catch (error) {
+    Swal.fire({
+      icon: "error",
+      title: "Update Failed",
+      text: "Something went wrong while updating product.",
+    });
+  }
+};
 
   // 🔹 DELETE PRODUCT
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure?")) return;
-    try {
-      await deleteItem(id);
-      setItems((prev) => prev.filter((it) => it._id !== id));
-    } catch (error) {
-      console.error("Delete error:", error);
-    }
-  };
+  const result = await Swal.fire({
+    title: "Are you sure?",
+    text: "This product will be removed from the list!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    await deleteItem(id);
+
+    setItems((prev) => prev.filter((it) => it._id !== id));
+
+    Swal.fire({
+      icon: "success",
+      title: "Deleted!",
+      text: "Product has been deleted successfully.",
+      timer: 1500,
+      showConfirmButton: false,
+    });
+  } catch (error) {
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: "Something went wrong while deleting.",
+    });
+  }
+};
+
 
   return (
     <div className="w-full overflow-x-auto p-4">
