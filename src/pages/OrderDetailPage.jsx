@@ -149,14 +149,16 @@ const handleStatusChange = async (orderId, oldStatus, newStatus) => {
                 {filteredOrders.map((order, index) => (
                   <tr key={order._id}>
                     <td className="border px-4 py-2">{index + 1}</td>
-                    <td className="border px-4 py-2">{order.user?.name}</td>
-                    <td className="border px-4 py-2">{order.user?.email}</td>
-                    <td className="border px-4 py-2">{order.user?.phone}</td>
-                  <td className="border px-4 py-2 text-left whitespace-nowrap overflow-x-auto">
-  {`${order.address?.address}, ${order.address?.city}, ${order.address?.state}, ${order.address?.country} - ${order.address?.pincode}`}
-</td>
+                    <td className="border px-4 py-2">{order.user?.name  || "N/A"}</td>
+                    <td className="border px-4 py-2">{order.user?.email || "N/A"}</td>
+                    <td className="border px-4 py-2">{order.user?.phone || "N/A"}</td>
+                   <td className="border px-4 py-2 text-left whitespace-nowrap overflow-x-auto">
+        {order.address?.address && order.address?.city && order.address?.state && order.address?.country && order.address?.pincode
+          ? `${order.address?.address}, ${order.address?.city}, ${order.address?.state}, ${order.address?.country} - ${order.address?.pincode}`
+          : "N/A"}
+      </td>
 
-                    <td className="border px-4 py-2">{order.paymentType}</td>
+                    <td className="border px-4 py-2 whitespace-nowrap">{order.paymentType || "N/A"}</td>
                     <td className="border px-4 py-2">{order.totalAmount?.toFixed(2) || "0.00"}</td>
                     <td className="border px-4 py-2 text-left min-w-[200px]">
                       {order.products?.map((p) => p.combination || "N/A").join(", ")}
