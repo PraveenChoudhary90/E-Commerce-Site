@@ -65,7 +65,7 @@ const AdminMembers = () => {
                       className="w-12 h-12 rounded-full object-cover"
                     />
                   </td>
-                  <td className="p-3">{member.name}</td>
+                  <td className="p-3 whitespace-nowrap">{member.name}</td>
                   <td className="p-3">{member.mobile}</td>
                   <td className="p-3">{member.email}</td>
                   <td className="p-3">{member.status}</td>
