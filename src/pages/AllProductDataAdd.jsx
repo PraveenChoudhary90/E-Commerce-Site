@@ -157,7 +157,7 @@ const ProductCard = () => {
       {items.length === 0 ? (
         <p className="text-center text-gray-500">No data found</p>
       ) : (
-        <table className="min-w-full border border-gray-200 rounded-lg">
+        <table className="min-w-full border border-gray-200 rounded-lg whitespace-nowrap">
           <thead className="bg-gray-100">
             <tr className="text-sm text-gray-600 text-left">
               <th className="p-3 border">Index</th>

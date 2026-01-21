@@ -163,15 +163,16 @@ const handleStatusChange = async (orderId, oldStatus, newStatus) => {
           <div className="overflow-x-auto">
             <table className="min-w-full border border-gray-300">
               <thead>
-                <tr className="bg-gray-200 text-center">
+                <tr className="bg-gray-200 text-center whitespace-nowrap">
                   <th className="border px-4 py-2">Index</th>
                   <th className="border px-4 py-2">Image</th>
+                  <th className="border px-4 py-2 ">Vendor Id</th>
                   <th className="border px-4 py-2">Vendor Name</th>
-                  <th className="border px-4 py-2">Vednor Email</th>
+                  <th className="border px-4 py-2">Vendor Email</th>
                   <th className="border px-4 py-2">Phone</th>
-                  <th className="border px-4 py-2">Vendor Id</th>
                   <th className="border px-4 py-2">Address</th>
                   <th className="border px-4 py-2">Payment Type</th>
+                  <th className="border px-4 py-2">Payment Deposit Id</th>
                   <th className="border px-4 py-2">Total Amount (₹)</th>
                   <th className="border px-4 py-2">Products</th>
                   <th className="border px-4 py-2">Order Date</th>
@@ -197,6 +198,9 @@ const handleStatusChange = async (orderId, oldStatus, newStatus) => {
     />
   )}
 </td>
+        <td className="border px-4 py-2 font-mono text-sm text-gray-700">{order.invoiceNo || "N/A"}</td>
+
+
 
                                    <td className="border px-4 py-2 whitespace-nowrap">
   {order.userId?.firstName && order.userId?.lastName
@@ -205,7 +209,6 @@ const handleStatusChange = async (orderId, oldStatus, newStatus) => {
 </td>
                     <td className="border px-4 py-2">{order.user?.email || "N/A"}</td>
                     <td className="border px-4 py-2">{order.user?.phone || "N/A"}</td>
-                                   <td className="border px-4 py-2 font-mono text-sm text-gray-700">{order.invoiceNo || "N/A"}</td>
                    <td className="border px-4 py-2 text-left whitespace-nowrap overflow-x-auto">
         {order.address?.address && order.address?.city && order.address?.state && order.address?.country && order.address?.pincode
           ? `${order.address?.address}, ${order.address?.city}, ${order.address?.state}, ${order.address?.country} - ${order.address?.pincode}`
@@ -213,6 +216,7 @@ const handleStatusChange = async (orderId, oldStatus, newStatus) => {
       </td>
 
                     <td className="border px-4 py-2 whitespace-nowrap">{order.paymentType || "N/A"}</td>
+                    <td className="border px-4 py-2 whitespace-nowrap">{order.depositId || "N/A"}</td>
                     <td className="border px-4 py-2">{order.totalAmount?.toFixed(2) || "0.00"}</td>
                     <td className="border px-4 py-2 text-left min-w-[200px]">
                       {order.products?.map((p) => p.combination || "N/A").join(", ")}
