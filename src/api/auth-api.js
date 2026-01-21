@@ -39,7 +39,12 @@ export async function getOrderDetails() {
 
 export async function cancelOrderByAdmin(orderId,newStatus){
   const payload={newStatus}
-  const response =await Axios.put(`${apiUrl}/orders/status-update/${orderId}`, payload)
+  const response =await Axios.put(`${apiUrl}/orders/status-update/${orderId}`,{ payload,
+     headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, //  Token yahin send ho raha hai
+      },
+  })
   return response.data;
 };
 
