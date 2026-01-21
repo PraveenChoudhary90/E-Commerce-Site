@@ -12,6 +12,8 @@ const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [invoiceSearch, setInvoiceSearch] = useState("");
+
   const navigate = useNavigate();
   const invoiceRef = useRef(null);
 
@@ -30,11 +32,18 @@ const OrderHistory = () => {
     fetchOrders();
   }, []);
 
-  const filteredOrders = orders?.filter(
-    (order) =>
-      filter === "all" ||
-      order.status?.toLowerCase() === filter.toLowerCase()
-  );
+  const filteredOrders = orders?.filter((order) => {
+  const statusMatch =
+    filter === "all" ||
+    order.status?.toLowerCase() === filter.toLowerCase();
+
+  const invoiceMatch =
+    !invoiceSearch ||
+    String(order.invoiceNo).includes(invoiceSearch);
+
+  return statusMatch && invoiceMatch;
+});
+
 
   const handleDetail = (order) => setSelectedOrder(order);
 
@@ -121,19 +130,34 @@ const handleStatusChange = async (orderId, oldStatus, newStatus) => {
         <p className="text-gray-600 mb-4">
           Total Orders: <strong>{filteredOrders.length}</strong>
         </p>
+<div className="flex flex-col md:flex-row gap-3 mb-4">
+  <select
+    className="p-2 border min-w-52 border-gray-300 rounded-lg"
+    value={filter}
+    onChange={(e) => setFilter(e.target.value)}
+  >
+    <option value="all">All Orders</option>
+    <option value="pending">Pending</option>
+    <option value="SUCCESS">Success</option>
+    <option value="failed">Failed</option>
+  </select>
 
-        <div className="mb-4">
-          <select
-            className="p-2 border min-w-52 border-gray-300 rounded-lg"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-          >
-            <option value="all">All Orders</option>
-            <option value="pending">Pending</option>
-            <option value="SUCCESS">Success</option>
-            <option value="failed">Failed</option>
-          </select>
-        </div>
+  <input
+    type="text"
+    placeholder="Search by Invoice Number"
+    value={invoiceSearch}
+    onChange={(e) => setInvoiceSearch(e.target.value)}
+    className="p-2 border border-gray-300 rounded-lg min-w-60"
+  />
+
+  <button
+    onClick={() => setInvoiceSearch("")}
+    className="px-4 py-2 bg-gray-200 rounded-lg text-sm"
+  >
+    Clear
+  </button>
+</div>
+
 
         {filteredOrders.length > 0 ? (
           <div className="overflow-x-auto">
@@ -141,9 +165,11 @@ const handleStatusChange = async (orderId, oldStatus, newStatus) => {
               <thead>
                 <tr className="bg-gray-200 text-center">
                   <th className="border px-4 py-2">Index</th>
+                  <th className="border px-4 py-2">Image</th>
                   <th className="border px-4 py-2">Vendor Name</th>
                   <th className="border px-4 py-2">Vednor Email</th>
                   <th className="border px-4 py-2">Phone</th>
+                  <th className="border px-4 py-2">Vendor Id</th>
                   <th className="border px-4 py-2">Address</th>
                   <th className="border px-4 py-2">Payment Type</th>
                   <th className="border px-4 py-2">Total Amount (₹)</th>
@@ -158,6 +184,20 @@ const handleStatusChange = async (orderId, oldStatus, newStatus) => {
                 {filteredOrders.map((order, index) => (
                   <tr key={order._id}>
                     <td className="border px-4 py-2">{index + 1}</td>
+                    <td className="border px-4 py-2">
+  {order.products?.[0]?.images?.[0] && (
+    <img
+      src={
+        order.products[0].images[0].startsWith("http")
+          ? order.products[0].images[0]
+          : `https://ik.imagekit.io/ynpnes3kr/${order.products[0].images[0]}`
+      }
+      className="w-12 h-12 object-cover rounded border mx-auto"
+      crossOrigin="anonymous"
+    />
+  )}
+</td>
+
                                    <td className="border px-4 py-2 whitespace-nowrap">
   {order.userId?.firstName && order.userId?.lastName
     ? `${order.userId.firstName} ${order.userId.lastName}`
@@ -165,6 +205,7 @@ const handleStatusChange = async (orderId, oldStatus, newStatus) => {
 </td>
                     <td className="border px-4 py-2">{order.user?.email || "N/A"}</td>
                     <td className="border px-4 py-2">{order.user?.phone || "N/A"}</td>
+                                   <td className="border px-4 py-2 font-mono text-sm text-gray-700">{order.invoiceNo || "N/A"}</td>
                    <td className="border px-4 py-2 text-left whitespace-nowrap overflow-x-auto">
         {order.address?.address && order.address?.city && order.address?.state && order.address?.country && order.address?.pincode
           ? `${order.address?.address}, ${order.address?.city}, ${order.address?.state}, ${order.address?.country} - ${order.address?.pincode}`
@@ -323,9 +364,28 @@ const handleStatusChange = async (orderId, oldStatus, newStatus) => {
                     {selectedOrder.products?.map((p, i) => (
                       <tr key={i} className="border-b hover:bg-gray-50">
                         <td className="p-4">
-                          <div className="font-bold text-gray-800 text-base">{p.combination}</div>
-                          <div className="text-[11px] text-gray-500 italic leading-tight mt-1">{p.description}</div>
-                        </td>
+  <div className="font-bold text-gray-800 text-base">{p.combination}</div>
+  <div className="text-[11px] text-gray-500 italic mt-1">
+    {p.description}
+  </div>
+
+  {/* ALL IMAGES */}
+  <div className="flex gap-2 mt-2 flex-wrap">
+    {p.images?.map((img, idx) => (
+      <img
+        key={idx}
+        src={
+          img.startsWith("http")
+            ? img
+            : `https://ik.imagekit.io/ynpnes3kr/${img}`
+        }
+        className="w-16 h-16 object-cover border rounded"
+        crossOrigin="anonymous"
+      />
+    ))}
+  </div>
+</td>
+
                         <td className="p-4 text-center text-gray-700">{p.quantity}</td>
                         <td className="p-4 text-right text-gray-700">₹{p.price.toFixed(2)}</td>
                         <td className="p-4 text-right text-gray-400">{p.gst}%</td>
