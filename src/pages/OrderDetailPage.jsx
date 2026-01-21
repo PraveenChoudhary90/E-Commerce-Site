@@ -158,7 +158,11 @@ const handleStatusChange = async (orderId, oldStatus, newStatus) => {
                 {filteredOrders.map((order, index) => (
                   <tr key={order._id}>
                     <td className="border px-4 py-2">{index + 1}</td>
-                    <td className="border px-4 py-2">{order.user?.name  || "N/A"}</td>
+                                   <td className="border px-4 py-2 whitespace-nowrap">
+  {order.userId?.firstName && order.userId?.lastName
+    ? `${order.userId.firstName} ${order.userId.lastName}`
+    : order.user?.name || "N/A"}
+</td>
                     <td className="border px-4 py-2">{order.user?.email || "N/A"}</td>
                     <td className="border px-4 py-2">{order.user?.phone || "N/A"}</td>
                    <td className="border px-4 py-2 text-left whitespace-nowrap overflow-x-auto">
@@ -285,7 +289,10 @@ const handleStatusChange = async (orderId, oldStatus, newStatus) => {
                 <div className="flex flex-col md:flex-row justify-between mb-8">
                   <div className="w-full md:w-1/2 mb-4 md:mb-0">
                     <h2 className="text-sm font-bold text-gray-400 mb-2 uppercase border-b pb-1">BILL TO</h2>
-                    <p className="font-bold text-lg text-gray-900">{selectedOrder.user.name}</p>
+                    <p className="font-bold text-lg text-gray-900">
+  {selectedOrder.userId?.firstName} {selectedOrder.userId?.lastName}
+</p>
+
                     <p className="text-sm text-gray-600">{selectedOrder.address?.address}</p>
                     <p className="text-sm text-gray-600">{selectedOrder.address?.city}, {selectedOrder.address?.state} - {selectedOrder.address?.pincode}</p>
                     <p className="text-sm font-medium mt-1">Phone: +91 {selectedOrder.userId?.mobileNumber || selectedOrder.user?.phone}</p>
