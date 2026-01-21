@@ -37,11 +37,20 @@ const OrderHistory = () => {
     filter === "all" ||
     order.status?.toLowerCase() === filter.toLowerCase();
 
-  const invoiceMatch =
-    !invoiceSearch ||
-    String(order.invoiceNo).includes(invoiceSearch);
+  const searchValue = invoiceSearch.toLowerCase();
 
-  return statusMatch && invoiceMatch;
+  if (!searchValue) return statusMatch;
+
+  // Fields to search
+  const invoiceMatch = String(order.invoiceNo || "").toLowerCase().includes(searchValue);
+  const depositMatch = String(order.depositId || "").toLowerCase().includes(searchValue);
+  const phoneMatch = String(order.user?.phone || order.userId?.mobileNumber || "").toLowerCase().includes(searchValue);
+  const nameMatch = ((order.userId?.firstName || "") + " " + (order.userId?.lastName || "")).toLowerCase().includes(searchValue)
+                  || (order.user?.name || "").toLowerCase().includes(searchValue);
+  const emailMatch = (order.user?.email || "").toLowerCase().includes(searchValue);
+
+  // Return true if any field matches and status matches
+  return statusMatch && (invoiceMatch || depositMatch || phoneMatch || nameMatch || emailMatch);
 });
 
 
@@ -142,13 +151,14 @@ const handleStatusChange = async (orderId, oldStatus, newStatus) => {
     <option value="failed">Failed</option>
   </select>
 
-  <input
-    type="text"
-    placeholder="Search by Invoice Number"
-    value={invoiceSearch}
-    onChange={(e) => setInvoiceSearch(e.target.value)}
-    className="p-2 border border-gray-300 rounded-lg min-w-60"
-  />
+ <input
+  type="text"
+  placeholder="Search by Invoice, Deposit Id, Name, Email or Phone"
+  value={invoiceSearch}
+  onChange={(e) => setInvoiceSearch(e.target.value)}
+  className="p-2 border border-gray-300 rounded-lg min-w-60"
+/>
+
 
   <button
     onClick={() => setInvoiceSearch("")}
@@ -270,7 +280,7 @@ const handleStatusChange = async (orderId, oldStatus, newStatus) => {
 
 
 
-                    <td className="border px-4 py-2">
+                    <td className="border px-4 py-2 whitespace-nowrap">
                       <button
                         className="text-bg-color hover:underline"
                         onClick={() => handleDetail(order)}
