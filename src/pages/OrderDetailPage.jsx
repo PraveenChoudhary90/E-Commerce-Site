@@ -54,9 +54,30 @@ const OrderHistory = () => {
     pdf.save(`Invoice_${selectedOrder._id.slice(-6)}.pdf`);
   };
 
+
+// Allowed status transitions
+const STATUS_TRANSITIONS = {
+  PENDING: ["SUCCESS", "CANCELED"], // FAILED removed
+  SUCCESS: [],      // Delivered is final
+  CANCELED: [],     // final
+};
+
+
+
 const handleStatusChange = async (orderId, oldStatus, newStatus) => {
+  // If same status, do nothing
   if (oldStatus === newStatus) return;
 
+  // Check if this transition is allowed
+  if (!STATUS_TRANSITIONS[oldStatus].includes(newStatus)) {
+    return Swal.fire(
+      "Not Allowed",
+      `Order is already ${oldStatus} Delivered and cannot be changed to ${newStatus}.`,
+      "warning"
+    );
+  }
+
+  // Confirm with SweetAlert
   const result = await Swal.fire({
     title: "Confirm Status Change",
     text: `Change order status from "${oldStatus}" to "${newStatus}"?`,
@@ -65,38 +86,26 @@ const handleStatusChange = async (orderId, oldStatus, newStatus) => {
     confirmButtonColor: newStatus === "CANCELED" ? "#d33" : "#3085d6",
     cancelButtonColor: "#aaa",
     confirmButtonText: "Yes, update",
-    cancelButtonText: "No",
   });
 
   if (!result.isConfirmed) return;
 
   try {
-    await cancelOrderByAdmin(orderId, newStatus);
+    await cancelOrderByAdmin(orderId, newStatus); // API call
 
-    // 🔥 Frontend me orders ko update karo
-    setOrders((prevOrders) =>
-      prevOrders.map((order) =>
-        order._id === orderId ? { ...order, status: newStatus } : order
-      )
+    setOrders((prev) =>
+      prev.map((o) => (o._id === orderId ? { ...o, status: newStatus } : o))
     );
 
-    Swal.fire({
-      icon: "success",
-      title: "Updated!",
-      text: `Order status changed to "${newStatus}"`,
-      timer: 1500,
-      showConfirmButton: false,
-    });
+    Swal.fire("Updated", "Order status updated", "success");
   } catch (error) {
     Swal.fire(
       "Error",
-      error?.response?.data?.message || "Failed to update order status",
+      error?.response?.data?.message || "Failed to update status",
       "error"
     );
   }
 };
-
-
 
 
 
@@ -166,42 +175,51 @@ const handleStatusChange = async (orderId, oldStatus, newStatus) => {
                     <td className="border px-4 py-2">
                       {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A"}
                     </td>
-                    <td className="border px-4 py-2">
-  <span
-    className={`px-2 py-1 rounded font-bold text-white text-sm ${
-      order.status === "PENDING"
-        ? "bg-yellow-500"
-        : order.status === "DISPATCHED"
-        ? "bg-blue-500"
-        : order.status === "SUCCESS"
-        ? "bg-green-600"
-        : order.status === "FAILED"
-        ? "bg-red-500"
-        : order.status === "CANCELED"
-        ? "bg-gray-500"
-        : "bg-gray-300"
-    }`}
-  >
-    {order.status}
-  </span>
+<td>
+ <span
+  className={`px-2 py-1 rounded font-bold text-white text-sm ${
+    order.status === "PENDING"
+      ? "bg-yellow-500"
+      : order.status === "SUCCESS"
+      ? "bg-green-600"
+      : order.status === "CANCELED"
+      ? "bg-gray-500"
+      : "bg-gray-300"
+  }`}
+>
+  {order.status === "PENDING"
+    ? "Orders Pending"
+    : order.status === "SUCCESS"
+    ? "Delivered"
+    : order.status === "CANCELED"
+    ? "Canceled"
+    : order.status}
+</span>
+
 </td>
 
                     {/* Cancel button: only if order is not Cancelled or SUCCESS */}
-      <td className="border px-4 py-2">
+    <td className="border px-4 py-2">
   <select
-    value={order.status}
-    className="border rounded px-2 py-1 text-sm"
-    onChange={(e) =>
-      handleStatusChange(order._id, order.status, e.target.value)
-    }
-  >
-    <option value="PENDING">Pending</option>
-    <option value="DISPATCHED">Dispatched</option>
-    <option value="SUCCESS">Success (Delivered)</option>
-    <option value="FAILED">Failed</option>
-    <option value="CANCELED">Cancel</option>
-  </select>
+  value={order.status}
+  className="border rounded px-2 py-1 text-sm"
+  onChange={(e) =>
+    handleStatusChange(order._id, order.status, e.target.value)
+  }
+>
+  {["PENDING", "SUCCESS", "CANCELED"].map((status) => (
+    <option key={status} value={status}>
+      {status === "PENDING"
+        ? "Orders Pending"
+        : status === "SUCCESS"
+        ? "Delivered"
+        : "Canceled"}
+    </option>
+  ))}
+</select>
 </td>
+
+
 
                     <td className="border px-4 py-2">
                       <button
