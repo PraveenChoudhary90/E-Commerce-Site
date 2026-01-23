@@ -55,24 +55,55 @@ const AddMemberPopup = ({ onClose, onSuccess, editMode = false, data = {} }) => 
   const handleChange = (key, value) => setPayload(prev => ({ ...prev, [key]: value }));
 
   const validateFields = () => {
-    let tempErrors = {};
-    if (!payload.name) tempErrors.name = "Name is required!";
-    if (!payload.email) tempErrors.email = "Email is required!";
-    if (!editMode && !payload.password) tempErrors.password = "Password is required!";
-    if (!payload.mobile) tempErrors.mobile = "Mobile number is required!";
-    if (!payload.aadhaarNumber) tempErrors.aadhaarNumber = "Aadhaar number is required!";
-    if (!payload.panNumber) tempErrors.panNumber = "PAN number is required!";
-    else if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(payload.panNumber)) tempErrors.panNumber = "Enter valid PAN number! (ABCDE1234F)";
-    
-    if (!editMode) {
-      if (!payload.aadhaarPic) tempErrors.aadhaarPic = "Aadhaar photo required!";
-      if (!payload.userPic) tempErrors.userPic = "User photo required!";
-      if (!payload.panPic) tempErrors.panPic = "PAN photo required!";
-    }
+  let tempErrors = {};
 
-    setErrors(tempErrors);
-    return Object.keys(tempErrors).length === 0;
-  };
+  // NAME
+  if (!payload.name) tempErrors.name = "Name is required!";
+
+  // EMAIL
+  if (!payload.email) {
+    tempErrors.email = "Email is required!";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
+    tempErrors.email = "Enter valid email (must contain @)";
+  }
+
+  // PASSWORD (only add mode)
+  if (!editMode && !payload.password) {
+    tempErrors.password = "Password is required!";
+  }
+
+  // MOBILE – exact 10 digit
+  if (!payload.mobile) {
+    tempErrors.mobile = "Mobile number is required!";
+  } else if (!/^[0-9]{10}$/.test(payload.mobile)) {
+    tempErrors.mobile = "Mobile number must be 10 digits!";
+  }
+
+  // AADHAAR – exact 12 digit
+  if (!payload.aadhaarNumber) {
+    tempErrors.aadhaarNumber = "Aadhaar number is required!";
+  } else if (!/^[0-9]{12}$/.test(payload.aadhaarNumber)) {
+    tempErrors.aadhaarNumber = "Aadhaar number must be 12 digits!";
+  }
+
+  // PAN
+  if (!payload.panNumber) {
+    tempErrors.panNumber = "PAN number is required!";
+  } else if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(payload.panNumber)) {
+    tempErrors.panNumber = "Enter valid PAN (ABCDE1234F)";
+  }
+
+  // FILES (only add mode)
+  if (!editMode) {
+    if (!payload.aadhaarPic) tempErrors.aadhaarPic = "Aadhaar photo required!";
+    if (!payload.userPic) tempErrors.userPic = "User photo required!";
+    if (!payload.panPic) tempErrors.panPic = "PAN photo required!";
+  }
+
+  setErrors(tempErrors);
+  return Object.keys(tempErrors).length === 0;
+};
+
 
   // Handle delete
   const handleDelete = async () => {

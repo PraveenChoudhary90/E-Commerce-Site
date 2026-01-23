@@ -70,7 +70,7 @@ const ManageMemberHead = () => {
               onClick={togglePopup}
               className="border-bg-color border min-h-80 sm:h-full flex flex-col justify-center items-center rounded-xl space-y-2 cursor-pointer"
             >
-              <IoMdAdd color="#702F8A" size={24} />
+              <IoMdAdd color="#085946" size={24} />
               <h1 className="text-bg-color font-medium">Create a New MR Member</h1>
             </div>
 
