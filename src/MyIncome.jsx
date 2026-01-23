@@ -49,7 +49,7 @@ const MyIncome = () => {
   }, [orders, startDate, endDate, incomeType]);
 
   // SUMMARY CALCULATIONS
-  const totalIncome = filteredOrders.reduce((a, b) => a + (b.amount || 0), 0);
+  const totalIncome = filteredOrders.reduce((a, b) => a + (b.income || 0), 0);
 
   const monthlyEarnings = filteredOrders
     .filter(o => {
@@ -57,7 +57,7 @@ const MyIncome = () => {
       const now = new Date();
       return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
     })
-    .reduce((a, b) => a + (b.amount || 0), 0);
+    .reduce((a, b) => a + (b.income || 0), 0);
 
   const referralBonus = filteredOrders
     .filter(o => o.level)
