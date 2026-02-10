@@ -135,7 +135,7 @@ const handleStatusChange = async (orderId, oldStatus, newStatus) => {
   return (
     <>
       <div className="p-4">
-        <h1 className="text-xl font-semibold mb-1">Vendor Order History</h1>
+        <h1 className="text-xl font-semibold mb-1">User Order History</h1>
         <p className="text-gray-600 mb-4">
           Total Orders: <strong>{filteredOrders.length}</strong>
         </p>

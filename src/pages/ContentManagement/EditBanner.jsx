@@ -12,16 +12,16 @@ const DEFAULT_BANNER_TYPES = [
   { value: "custom", label: "Custom (enter below)" },
 ];
 
-const EditBanner = ({ title, bannerData, onClick, editmode = false }) => {
+const EditBanner = ({ title, bannerData, onClick, editmode = false, onSaveSuccess }) => {
   const [select, setSelect] = useState({});
   const [banners, setBanners] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (bannerData) {
-      // Ensure existing banner has banner_type (fallback to hero)
       const bannerWithType = {
         ...bannerData,
+        id: bannerData._id,
         banner_type: bannerData.banner_type ?? "hero",
         custom_banner_type: bannerData.banner_type_custom ?? "",
         images: bannerData.images ?? [],
@@ -35,8 +35,8 @@ const EditBanner = ({ title, bannerData, onClick, editmode = false }) => {
           images: [],
           banner_name: "",
           banner_page: "",
-          banner_type: "hero", // default
-          custom_banner_type: "", // text input if type === 'custom'
+          banner_type: "hero",
+          custom_banner_type: "",
         },
       ]);
     }
@@ -63,7 +63,6 @@ const EditBanner = ({ title, bannerData, onClick, editmode = false }) => {
 
   const handleImageUpload = async (id, event) => {
     const files = Array.from(event.target.files);
-
     const base64Images = await Promise.all(
       files.map(
         (file) =>
@@ -74,7 +73,6 @@ const EditBanner = ({ title, bannerData, onClick, editmode = false }) => {
           })
       )
     );
-
     setBanners((prevBanners) =>
       prevBanners.map((banner) =>
         banner.id === id ? { ...banner, images: [...banner.images, ...base64Images] } : banner
@@ -83,13 +81,11 @@ const EditBanner = ({ title, bannerData, onClick, editmode = false }) => {
   };
 
   const handleBannerSave = async () => {
-    // Normalize banner_type: if 'custom' chosen, prefer custom_banner_type value
     const payload = banners.map((b) => {
       const finalType = b.banner_type === "custom" ? (b.custom_banner_type || "custom") : b.banner_type;
       return {
         ...b,
         banner_type: finalType,
-        // remove helper key before sending if needed by API
         custom_banner_type: undefined,
       };
     });
@@ -98,51 +94,47 @@ const EditBanner = ({ title, bannerData, onClick, editmode = false }) => {
       const updatedBanner = payload[0];
       try {
         setLoading(true);
-        await updateBanner(bannerData._id, updatedBanner);
-        Swal.fire({
-          icon: "success",
-          title: "Banner updated!",
-          text: "Banner updated Successfully",
-        }).then(() => window.location.reload());
+        const res = await updateBanner(bannerData._id, updatedBanner);
+        Swal.fire({ icon: "success", title: "Banner updated!", text: "Banner updated Successfully" });
+
+        // Update parent list instantly
+        if (onSaveSuccess) onSaveSuccess(updatedBanner, true);
       } catch (error) {
         console.log(error);
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: error?.response?.data?.message || "Something went wrong",
-        });
+        Swal.fire({ icon: "error", title: "Error", text: error?.response?.data?.message || "Something went wrong" });
       } finally {
         setLoading(false);
       }
     } else {
       try {
         setLoading(true);
-        await addBanner(payload);
-        Swal.fire({
-          icon: "success",
-          title: "Banner saved!",
-          text: "New Banner added Successfully",
-        }).then(() => window.location.reload());
+        const res = await addBanner(payload);
+        Swal.fire({ icon: "success", title: "Banner saved!", text: "New Banner added Successfully" });
+
+        if (onSaveSuccess) onSaveSuccess(res.data, false);
+
+        
+
+        // Reset form for new banner
+        setBanners([
+          {
+            id: 1,
+            title: "Banner 1",
+            images: [],
+            banner_name: "",
+            banner_page: "",
+            banner_type: "hero",
+            custom_banner_type: "",
+          },
+        ]);
       } catch (error) {
         console.log(error);
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: error?.response?.data?.message || "Something went wrong",
-        });
+        Swal.fire({ icon: "error", title: "Error", text: error?.response?.data?.message || "Something went wrong" });
       } finally {
         setLoading(false);
       }
     }
   };
-
-  const removeSlide = (id) => {
-    setBanners(banners.filter((banner) => banner.id !== id));
-  };
-
-  useEffect(() => {
-    getDetails().then((res) => setSelect(res));
-  }, []);
 
   const removeImage = (bannerId, imageIndex) => {
     setBanners((prevBanners) =>
@@ -153,6 +145,10 @@ const EditBanner = ({ title, bannerData, onClick, editmode = false }) => {
       )
     );
   };
+
+  useEffect(() => {
+    getDetails().then((res) => setSelect(res));
+  }, []);
 
   return (
     <>
@@ -193,13 +189,6 @@ const EditBanner = ({ title, bannerData, onClick, editmode = false }) => {
             <div className="p-4 bg-white space-y-5">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-medium">{banner.title} Image & Direction</h3>
-                <button
-                  onClick={() => removeSlide(banner.id)}
-                  className="px-4 py-2 bg-red-500 text-sm text-white rounded-md shadow hover:bg-red-600"
-                  type="button"
-                >
-                  Delete Slide
-                </button>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -247,7 +236,6 @@ const EditBanner = ({ title, bannerData, onClick, editmode = false }) => {
                     ))}
                   </select>
 
-                  {/* Show custom type text input when 'custom' selected */}
                   {banner.banner_type === "custom" && (
                     <div className="mt-2">
                       <label className="block text-sm font-medium mb-1">Custom Type</label>

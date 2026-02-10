@@ -46,5 +46,6 @@ export const Routers = {
   GALLERY_MANAGEMENT: "/gallery-management",
   HISTORY:"/order-history",
   ProductDisplay:"/ProductDisplay",
-  AllIncome:"/All-Income"
+  AllIncome:"/All-Income",
+  UserList:"/UserList"
 };

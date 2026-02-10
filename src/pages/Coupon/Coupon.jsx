@@ -6,35 +6,21 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 
-const Coupon = () => {
-  const [couponData, setCouponData] = useState([]);
+const Coupon = ({ coupons, setCoupons }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showCouponForm, setShowCouponForm] = useState(false);
   const [selectedCoupon, setSelectedCoupon] = useState(null);
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    formState: { errors },
-  } = useForm();
+  const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm();
 
-  
+  // Initial fetch from API
   useEffect(() => {
-    const getCoupons = async () => {
+    const fetchCoupons = async () => {
       try {
         setLoading(true);
-        setError(null);
-
-        
         const res = await getAllValidCoupons();
-        
-        const coupons = res?.data|| [];
-
-        setCouponData(coupons);
-        console.log("Coupons from API:", coupons);
+        setCoupons(res.data || []);
       } catch (err) {
         console.error("Failed to fetch coupons:", err);
         setError("Failed to fetch coupons");
@@ -43,15 +29,14 @@ const Coupon = () => {
       }
     };
 
-    getCoupons();
-  }, []);
+    fetchCoupons();
+  }, [setCoupons]);
 
-  
   const handleEditClick = (coupon) => {
     setSelectedCoupon(coupon);
     setShowCouponForm(true);
 
-    
+    setValue("schemeName", coupon.schemeName);
     setValue("couponCode", coupon.couponCode);
     setValue("discount", coupon.discount);
     if (coupon.validFrom) setValue("validFrom", coupon.validFrom.split("T")[0]);
@@ -70,17 +55,15 @@ const Coupon = () => {
         title: "Coupon Updated",
         text: "The coupon has been successfully updated!",
         confirmButtonColor: "#6366F1",
-      }).then(() => {
-        
-        setCouponData((prev) =>
-          prev.map((c) =>
-            c._id === selectedCoupon._id ? { ...c, ...data } : c
-          )
-        );
-        setShowCouponForm(false);
-        setSelectedCoupon(null);
-        reset();
       });
+
+      setCoupons(prev =>
+        prev.map(c => (c._id === selectedCoupon._id ? { ...c, ...data } : c))
+      );
+
+      setShowCouponForm(false);
+      setSelectedCoupon(null);
+      reset();
     } catch (error) {
       console.error("Update failed:", error);
       Swal.fire({
@@ -94,7 +77,6 @@ const Coupon = () => {
     }
   };
 
-  
   const handleDeleteClick = async (id) => {
     Swal.fire({
       title: "Are you sure?",
@@ -109,7 +91,7 @@ const Coupon = () => {
 
       try {
         await deleteCoupon(id);
-        setCouponData((prev) => prev.filter((coupon) => coupon._id !== id));
+        setCoupons(prev => prev.filter(coupon => coupon._id !== id));
         Swal.fire({
           title: "Deleted!",
           text: "Coupon has been deleted.",
@@ -128,7 +110,6 @@ const Coupon = () => {
     });
   };
 
- 
   return (
     <div>
       {loading && <PageLoader />}
@@ -136,22 +117,17 @@ const Coupon = () => {
 
       {!loading && !error && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {couponData.length > 0 ? (
-            couponData.map((coupon) => (
+          {coupons.length > 0 ? (
+            coupons.map((coupon) => (
               <div
                 key={coupon._id} 
                 className="bg-white rounded-lg p-4 relative border-l-4 border-bg-color shadow-md"
               >
                 <div className="w-full flex items-center justify-between gap-2 py-2">
                   <div>
-                    <h3 className="text-xl font-semibold">
-                      {coupon.schemeName}
-                    </h3>
+                    <h3 className="text-xl font-semibold">{coupon.schemeName}</h3>
                     <p className="text-xs text-gray-500">
-                      Code:{" "}
-                      <span className="font-semibold">
-                        {coupon.couponCode}
-                      </span>
+                      Code: <span className="font-semibold">{coupon.couponCode}</span>
                     </p>
                   </div>
 
@@ -172,28 +148,15 @@ const Coupon = () => {
                 </div>
 
                 <p className="text-gray-600 text-sm">
-                  Get{" "}
-                  <span className="font-bold text-green-600">
-                    {coupon.discount}% OFF
-                  </span>
+                  Get <span className="font-bold text-green-600">{coupon.discount}% OFF</span>
                 </p>
 
                 <p className="text-gray-500 text-sm mt-2">
-                  Valid from:{" "}
-                  <span className="font-semibold">
-                    {coupon.validFrom
-                      ? new Date(coupon.validFrom).toLocaleDateString()
-                      : "-"}
-                  </span>
+                  Valid from: <span className="font-semibold">{coupon.validFrom ? new Date(coupon.validFrom).toLocaleDateString() : "-"}</span>
                 </p>
 
                 <p className="text-gray-500 text-sm">
-                  Valid till:{" "}
-                  <span className="font-semibold">
-                    {coupon.validTill
-                      ? new Date(coupon.validTill).toLocaleDateString()
-                      : "-"}
-                  </span>
+                  Valid till: <span className="font-semibold">{coupon.validTill ? new Date(coupon.validTill).toLocaleDateString() : "-"}</span>
                 </p>
               </div>
             ))
@@ -207,9 +170,7 @@ const Coupon = () => {
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="md:w-1/2 mx-auto p-5 bg-white shadow-lg rounded-lg">
             <div className="flex justify-between items-start">
-              <h2 className="text-2xl font-bold mb-4 text-center">
-                {selectedCoupon ? "Edit Coupon" : "Create Coupon"}
-              </h2>
+              <h2 className="text-2xl font-bold mb-4 text-center">Edit Coupon</h2>
               <button
                 className="text-4xl text-red-400"
                 onClick={() => {
@@ -224,77 +185,50 @@ const Coupon = () => {
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
+                <label className="block font-medium">Scheme Name</label>
+                <input
+                  type="text"
+                  {...register("schemeName", { required: "Scheme name is required" })}
+                  className="w-full border p-2 rounded-md focus:ring-1 focus:ring-blue-300 outline-none"
+                />
+                {errors.schemeName && <p className="text-red-500 text-sm">{errors.schemeName.message}</p>}
+              </div>
+
+              <div>
                 <label className="block font-medium">Coupon Code</label>
                 <input
                   type="text"
-                  {...register("couponCode", {
-                    required: "Coupon code is required",
-                  })}
+                  {...register("couponCode", { required: "Coupon code is required" })}
                   className="w-full border p-2 rounded-md focus:ring-1 focus:ring-blue-300 outline-none"
                 />
-                {errors.couponCode && (
-                  <p className="text-red-500 text-sm">
-                    {errors.couponCode.message}
-                  </p>
-                )}
+                {errors.couponCode && <p className="text-red-500 text-sm">{errors.couponCode.message}</p>}
               </div>
 
               <div>
                 <label className="block font-medium">Discount (%)</label>
                 <input
                   type="number"
-                  {...register("discount", {
-                    required: "Discount is required",
-                    min: { value: 1, message: "Must be at least 1%" },
-                    max: { value: 100, message: "Cannot exceed 100%" },
-                  })}
+                  {...register("discount", { required: "Discount is required", min: 1, max: 100 })}
                   className="w-full border p-2 rounded-md focus:ring-1 focus:ring-blue-300 outline-none"
                 />
-                {errors.discount && (
-                  <p className="text-red-500 text-sm">
-                    {errors.discount.message}
-                  </p>
-                )}
+                {errors.discount && <p className="text-red-500 text-sm">{errors.discount.message}</p>}
               </div>
 
               <div>
                 <label className="block font-medium">Valid From</label>
-                <input
-                  type="date"
-                  {...register("validFrom", {
-                    required: "Start date is required",
-                  })}
-                  className="w-full border p-2 rounded-md focus:ring-1 focus:ring-blue-300 outline-none"
-                />
-                {errors.validFrom && (
-                  <p className="text-red-500 text-sm">
-                    {errors.validFrom.message}
-                  </p>
-                )}
+                <input type="date" {...register("validFrom", { required: true })} className="w-full border p-2 rounded-md focus:ring-1 focus:ring-blue-300 outline-none" />
               </div>
 
               <div>
                 <label className="block font-medium">Valid Till</label>
-                <input
-                  type="date"
-                  {...register("validTill", {
-                    required: "End date is required",
-                  })}
-                  className="w-full border p-2 rounded-md focus:ring-1 focus:ring-blue-300 outline-none"
-                />
-                {errors.validTill && (
-                  <p className="text-red-500 text-sm">
-                    {errors.validTill.message}
-                  </p>
-                )}
+                <input type="date" {...register("validTill", { required: true })} className="w-full border p-2 rounded-md focus:ring-1 focus:ring-blue-300 outline-none" />
               </div>
 
               <button
                 type="submit"
                 className="w-full bg-bg-color text-white py-2 rounded-md hover:bg-violet-700 transition"
-                disabled={loading}
               >
-                {loading ? "Updating..." : "Update Coupon"}
+                Update Coupon
               </button>
             </form>
           </div>

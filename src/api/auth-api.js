@@ -4,7 +4,7 @@ const apiUrl = "/admin";
 
 
 export async function loginWithEmailAdmin(payload) {
-  const response = await Axios.post("/auth/login", payload);
+  const response = await Axios.post("/admin/login", payload);
   return response?.data;
 }
 
@@ -62,14 +62,14 @@ export const getIncomeOrdersByAdmin = async () => {
 
 
 export async function getCategories() {
-  const response = await Axios.get(`${apiUrl}/get-product-details`);
+  const response = await Axios.get("/products/get-product-details");
   return response?.data;
 }
 
 // 🔹 UPDATE PRODUCT
 export async function updateItem(id, data) {
   try {
-    const response = await Axios.put(`${apiUrl}/update-product/${id}`, data, {
+    const response = await Axios.put(`products/update-product/${id}`, data, {
       headers: {
         "Content-Type": "multipart/form-data", 
       },
@@ -84,7 +84,7 @@ export async function updateItem(id, data) {
 // 🔹 DELETE PRODUCT
 export async function deleteItem(id) {
   try {
-    const response = await Axios.delete(`${apiUrl}/delete-product/${id}`);
+    const response = await Axios.delete(`products/delete-product/${id}`);
     return response;
   } catch (error) {
     console.error("Error deleting product:", error);
@@ -119,7 +119,7 @@ export async function deleteMember(id) {
 }
 
 export async function getSellerListToVerify() {
-  const response = await Axios.get('/auth/get-seller-list-to-verify');
+  const response = await Axios.get(`${apiUrl}/get-all-user`);
   return response?.data;
 }
 
@@ -150,7 +150,7 @@ export async function getAllValidCoupons() {
   return response?.data;
 }
 export async function updateCoupon(id , data) {
-  const response = await Axios.put(`${apiUrl}/create-coupon/${id}`,data);
+  const response = await Axios.put(`${apiUrl}/update-coupon/${id}`,data);
   return response?.data;
 }
 
@@ -189,6 +189,24 @@ export async function rewardManagement(payload) {
 
 export async function fetchRewards() {
   const response = await Axios.get(`${apiUrl}/get-reward-list`);
+  return response?.data;
+}
+
+
+// DELETE
+export async function deleteReward(id) {
+  const response = await Axios.delete(
+    `${apiUrl}/delete-reward/${id}`
+  );
+  return response?.data;
+}
+
+// UPDATE
+export async function updateReward(id, payload) {
+  const response = await Axios.put(
+    `${apiUrl}/update-reward/${id}`,
+    payload
+  );
   return response?.data;
 }
 

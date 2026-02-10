@@ -1,5 +1,6 @@
 import React from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { Routers } from "./constants/Routes";
 import Register from "./pages/Register/Register";
 import Layout from "./layout/Layout";
@@ -39,18 +40,21 @@ import GalleryManagement from "./pages/GalleryManagement/GalleryManagement";
 import OrderHistory from "./pages/OrderDetailPage";
 import ProductCard from "./pages/AllProductDataAdd";
 import MyIncome from "./MyIncome";
-// import CategoryList from "./pages/AddProductManagement/CategoryList";
-//import CategoryList from "./pages/AddProductManagement/CategoryList";
-
+import UserList from "./pages/AllUser";
 
 const RoutersPages = () => {
-  const token = localStorage.getItem("token");
+  // Redux se login status check karo
+  const userInfoadmin = useSelector(
+    (state) => state.userInfo.userInfoadmin
+  );
+
   return (
     <div>
       <ScrollToTop />
       <Routes>
-        {token === null || token === "" || token === undefined ? (
+        {!userInfoadmin ? (
           <>
+            {/* User logged out routes */}
             <Route path={Routers.Login} element={<Login />} />
             <Route path={Routers.Register} element={<Register />} />
             <Route path={Routers.VendorRegister} element={<VendorRegister />} />
@@ -62,52 +66,25 @@ const RoutersPages = () => {
           </>
         ) : (
           <>
+            {/* User logged in routes */}
             <Route path={Routers.Dashboard} element={<Layout />}>
               <Route index element={<Dashboard />} />
-              <Route
-                path={Routers.ContentManagement}
-                element={<ContentManagement />}
-              />
-                <Route path={Routers.GALLERY_MANAGEMENT} element={<GalleryManagement />} />
-               <Route
-                path={Routers.STATIC_BANNER}
-                element={<StaticBanner/>}
-              />
-              <Route
-                path={Routers.EmailManagement}
-                element={<EmailManagement1 />}
-              />
-                <Route
-                path={Routers.REFERRAL_MANAGEMENT}
-                element={<ReferralManagement />}
-              />
-              <Route path={Routers.HISTORY}
-              element={<OrderHistory/>}
-              />
-              <Route path={Routers.ProductDisplay}
-              element={<ProductCard/>}
-              />
-
-              <Route
-                path={Routers.EarningManagement}
-                element={<EarningManagement />}
-              />
-              <Route
-                path={Routers.EmailMessage}
-                element={<EmailManagement2 />}
-              />
-              <Route
-                path={Routers.InventoryManagement}
-                element={<InventoryManagement />}
-              />
+              <Route path={Routers.ContentManagement} element={<ContentManagement />} />
+              <Route path={Routers.GALLERY_MANAGEMENT} element={<GalleryManagement />} />
+              <Route path={Routers.STATIC_BANNER} element={<StaticBanner />} />
+              <Route path={Routers.EmailManagement} element={<EmailManagement1 />} />
+              <Route path={Routers.REFERRAL_MANAGEMENT} element={<ReferralManagement />} />
+              <Route path={Routers.HISTORY} element={<OrderHistory />} />
+              <Route path={Routers.ProductDisplay} element={<ProductCard />} />
+              <Route path={Routers.EarningManagement} element={<EarningManagement />} />
+              <Route path={Routers.EmailMessage} element={<EmailManagement2 />} />
+              <Route path={Routers.InventoryManagement} element={<InventoryManagement />} />
               <Route path={Routers.ProductList} element={<ProductList />} />
-              {/* <Route path={Routers.CATEGORY_MANAGMENT} element={<CategoryList />} /> */}
-              {/* <Route path={Routers.CheckOut} element={<CheckoutPage />} /> */}
               <Route path={Routers.ManageMembers} element={<ManageMembers />} />
               <Route path={Routers.MembersProfile} element={<MemberProfile />} />
               <Route path={Routers.AddProduct} element={<AddProduct />} />
-              <Route path={Routers.AllIncome} element={<MyIncome/>}/>
-               <Route path={Routers.AddCategories} element={<AddCategories />} /> 
+              <Route path={Routers.AllIncome} element={<MyIncome />} />
+              <Route path={Routers.AddCategories} element={<AddCategories />} />
               <Route path={Routers.AddCategoryType} element={<AddCategoryTypes />} />
               <Route path={Routers.AddCategoryBrand} element={<AddCategoryBrand />} />
               <Route path={Routers.VendorManagement} element={<VendorManagement />} />
@@ -115,25 +92,16 @@ const RoutersPages = () => {
               <Route path={Routers.ADD_COUPON} element={<OfferManagement />} />
               <Route path={Routers.REWARD_MANAGEMENT} element={<RewardManagement />} />
               <Route path={Routers.VendorDetails} element={<VendorManagementForm />} />
-              <Route
-                path={Routers.MarketingTool}
-                element={<MarketingTool />}
-              />
-              <Route
-                path={Routers.MarketingToolAllVideos}
-                element={<AllGetVideos />}
-              />
-              <Route
-                path={Routers.MarketingToolAllImages}
-                element={<AllGetImages />}
-              />
-              <Route
-                path={Routers.MarketingToolAllPdf}
-                element={<AllGetPdf />}
-              />
+              <Route path={Routers.MarketingTool} element={<MarketingTool />} />
+              <Route path={Routers.MarketingToolAllVideos} element={<AllGetVideos />} />
+              <Route path={Routers.MarketingToolAllImages} element={<AllGetImages />} />
+              <Route path={Routers.MarketingToolAllPdf} element={<AllGetPdf />} />
+              <Route path={Routers.UserList} element={<UserList/>}/>
             </Route>
+
+            {/* 404 & fallback */}
             <Route path={Routers.NotFound} element={<NotFound />} />
-            <Route path="*" element={<Layout />} />
+            <Route path="*" element={<Navigate to={Routers.Dashboard} replace />} />
           </>
         )}
       </Routes>

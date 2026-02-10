@@ -1,217 +1,131 @@
-import React, { useEffect, useState } from "react";
-// import bgimage2 from "../../assets/dashboard/bgimage2.svg";
-import TourismAchievement from "./TourismAchievement";
-import HeaderStats from "./HeaderStats";
-import AdminMembers from "./AdminMembers";
-import RetailorMembers from "./RetailorMembers";
-import Notifications from "./NotificationCard";
-import TopStats from "../../components/TopStats";
+import React, { useState } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
+
 import Footer1 from "../../components/Footer1";
-import Banner from "./Banner";
-import Chart from "./Chart";
-import Graph from "./Graph";
-import { getSellerListToVerify, getOrderDetails } from "../../api/auth-api";
 import PageLoader from "../../components/ui/PageLoader";
-import { FaFileAlt, FaUser } from "react-icons/fa";
-import { LiaRupeeSignSolid } from "react-icons/lia";
-import { useDispatch } from "react-redux";
-import { setVendorData } from "../../redux/slice/vendorManagementSlice";
-import Swal from "sweetalert2";
 import ReferalButton from "./ReferalButton";
 
+import { FaArrowCircleRight, FaShoppingCart, FaChartLine, FaRegTimesCircle, FaUsers } from "react-icons/fa";
+import { LiaRupeeSignSolid } from "react-icons/lia";
+
 const Dashboard = () => {
-  const [dashboardStats, setDashboardStats] = useState([]);
-  const [memberLists, setMemberLists] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [cancelledOrdersCount, setCancelledOrdersCount] = useState(0);
-  const [cancelledOrdersAmount, setCancelledOrdersAmount] = useState(0);
+  const [loading] = useState(false);
 
-  const dispatch = useDispatch();
-
-  // 1️⃣ Fetch Orders & calculate Today's Sales, Total Sales, Cancelled Orders Count & Amount
-  const fetchSalesFromOrders = async () => {
-    try {
-      const res = await getOrderDetails();
-      const orders = res?.data || res || [];
-
-      let todaysSales = 0;
-      let totalSales = 0;
-      let cancelledCount = 0;
-      let cancelledAmount = 0;
-
-      const today = new Date();
-      const todayDate = today.getDate();
-      const todayMonth = today.getMonth();
-      const todayYear = today.getFullYear();
-
-      orders.forEach((order) => {
-        // Count cancelled orders and sum their totalAmount
-        if (order.status === "CANCELED") {
-          cancelledCount++;
-          cancelledAmount += Number(order.totalAmount || 0);
-        }
-
-        // Only count SUCCESS orders for sales
-        if (order.status !== "SUCCESS") return;
-
-        const amount = Number(order.totalAmount || 0);
-        totalSales += amount;
-
-        const orderDate = new Date(order.createdAt);
-        if (
-          orderDate.getFullYear() === todayYear &&
-          orderDate.getMonth() === todayMonth &&
-          orderDate.getDate() === todayDate
-        ) {
-          todaysSales += amount;
-        }
-      });
-
-      setCancelledOrdersCount(cancelledCount);
-      setCancelledOrdersAmount(cancelledAmount);
-
-      return { todaysSales, totalSales };
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-      return { todaysSales: 0, totalSales: 0 };
-    }
-  };
-
-  // 2️⃣ Fetch Vendors & calculate Today's and Total Vendors
-  const fetchVendorStats = async () => {
-    const res = await getSellerListToVerify();
-    const vendors = res?.data || [];
-    const today = new Date().toISOString().split("T")[0];
-
-    const totalUsers = vendors.length;
-    const todaysUsers = vendors.filter(
-      (v) => v?.createdAt?.split("T")[0] === today
-    ).length;
-
-    return { totalUsers, todaysUsers };
-  };
-
-  // 3️⃣ Combine Sales and Vendor stats
-  const fetchDashboardStats = async () => {
-    try {
-      setLoading(true);
-
-      const salesData = await fetchSalesFromOrders();
-      const vendorData = await fetchVendorStats();
-
-      setDashboardStats({
-        todaysSales: salesData.todaysSales,
-        totalSales: salesData.totalSales,
-        todaysUsers: vendorData.todaysUsers,
-        totalUsers: vendorData.totalUsers,
-      });
-    } catch (error) {
-      console.error(error);
-      Swal.fire({
-        title: "Error",
-        text: "Error fetching dashboard stats",
-        confirmButtonText: "OK",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 4️⃣ Fetch Dashboard Data (members, topProducts, topBrands, etc.)
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      // Fetch additional dashboard details if needed
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 5️⃣ Fetch Vendor Data to Redux store
-  useEffect(() => {
-    const fetchVendorData = async () => {
-      try {
-        setLoading(true);
-        const vendordata = await getSellerListToVerify();
-        dispatch(setVendorData(vendordata));
-      } catch (error) {
-        console.error("Error fetching vendor data:", error);
-        Swal.fire({
-          title: "Error",
-          text: error?.response?.data?.message || "Error fetching vendor data",
-          confirmButtonText: "OK",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchVendorData();
-  }, [dispatch]);
-
-  // 6️⃣ Fetch dashboard stats on mount
-  useEffect(() => {
-    fetchDashboardStats();
-    fetchDashboardData();
-  }, []);
-
-  // 7️⃣ Stats cards including Cancelled Orders Count & Amount
   const stats = [
     {
       title: "Today's Sales",
-      value: dashboardStats?.todaysSales?.toFixed(2) || 0,
-      symbol: "₹",
-      icon: <LiaRupeeSignSolid />,
+      value: "12,450",
+      icon: <FaShoppingCart />,
+      color: "bg-gradient-to-r from-cyan-500 to-blue-500", // Dynamic Gradient
+      footerText: "More info",
     },
     {
       title: "Total Sales",
-      value: dashboardStats?.totalSales?.toFixed(2) || 0,
-      symbol: "₹",
-      icon: <LiaRupeeSignSolid />,
+      value: "5,80,200",
+      icon: <FaChartLine />,
+      color: "bg-gradient-to-r from-emerald-500 to-green-600",
+      footerText: "View report",
     },
     {
-      title: "New Joined Vendors (Today)",
-      value: dashboardStats?.todaysUsers || 0,
-      symbol: dashboardStats?.todaysUsers > 0 ? "+" : "",
-      icon: <FaUser />,
+    title: "Today Cancelled Orders",
+    value: "5",
+    icon: <FaRegTimesCircle />,
+    color: "bg-gradient-to-r from-rose-500 to-blue-600",// Warning Orange (Distinct)
+    footerText: "Check details",
+  },
+    {
+      title: "All Cancelled Orders",
+      value: "14",
+      icon: <FaRegTimesCircle />,
+      color: "bg-gradient-to-r from-rose-500 to-red-600",
+      footerText: "Check details",
     },
     {
-      title: "Total Vendors",
-      value: dashboardStats?.totalUsers || 0,
-      symbol: "",
-      icon: <FaUser />,
-    },
-    {
-      title: "Cancelled Orders",
-      value: cancelledOrdersCount,
-      symbol: "",
-      icon: <FaFileAlt />,
-    },
-    {
-      title: "Cancelled Orders Amount",
-      value: cancelledOrdersAmount.toFixed(2),
-      symbol: "₹",
-      icon: <LiaRupeeSignSolid />,
+      title: "Active Users",
+      value: "450",
+      icon: <FaUsers />,
+      color: "bg-gradient-to-r from-amber-400 to-orange-500",
+      footerText: "Manage users",
     },
   ];
 
   return (
     <>
       {loading && <PageLoader />}
-      <div className="space-y-7">
-        <HeaderStats data={stats} />
-        <ReferalButton />
-        <div className="col-span-2 lg:col-span-1">
-          <RetailorMembers />
+      
+      <div className="p-4 md:p-8 bg-[#f4f7f6] min-h-screen font-sans">
+        
+        {/* --- E-COMMERCE SLIDER --- */}
+        <div className="mb-10 rounded-2xl overflow-hidden shadow-xl border-4 border-white">
+          <Swiper
+            spaceBetween={0}
+            autoplay={{ delay: 4000 }}
+            pagination={{ clickable: true }}
+            modules={[Autoplay, Pagination]}
+            className="h-56 md:h-80"
+          >
+            {[
+              "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop", // Fashion Store
+              "https://images.unsplash.com/photo-1472851294608-062f824d29cc?q=80&w=2070&auto=format&fit=crop"  // Marketplace
+            ].map((url, i) => (
+              <SwiperSlide key={i}>
+                <div className="relative w-full h-full">
+                  <img src={url} alt="Ecom Banner" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex items-center px-10">
+                    <div className="max-w-md">
+                      <h2 className="text-white text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
+                        GROW YOUR <br />
+                        <span className="text-yellow-400">BUSINESS</span> ONLINE
+                      </h2>
+                      <p className="text-gray-200 mt-2 hidden md:block">Analyze your sales, manage users, and scale your empire.</p>
+                    </div>
+                  </div>
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </div>
-        <AdminMembers data={memberLists} adminListHangler={fetchDashboardData} />
-        {/* <Notifications /> */}
-        {/* <TourismAchievement img={bgimage2} bgcolor={"bg-[#ffffffc4]"} /> */}
-        {/* <Graph /> */}
-        {/* <TopStats topProducts={topProducts} topBrands={topBrands} topCategories={topCategories} /> */}
-        {/* <Banner banner={banner} /> */}
-        <Footer1 />
+
+        {/* --- UPGRADED STATS CARDS --- */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map((item, index) => (
+            <div 
+              key={index} 
+              className={`${item.color} rounded-xl shadow-lg text-white overflow-hidden relative group transition-all duration-500 transform hover:-translate-y-2 hover:shadow-2xl`}
+            >
+              <div className="p-6">
+                <div className="relative z-10">
+                  <p className="text-xs font-bold opacity-80 uppercase tracking-widest mb-1">{item.title}</p>
+                  <h3 className="text-4xl font-black flex items-center gap-1">
+                    {item.title.toLowerCase().includes("sales") || item.title.toLowerCase().includes("revenue") ? (
+                      <><LiaRupeeSignSolid className="text-3xl" />{item.value}</>
+                    ) : (
+                      item.value
+                    )}
+                  </h3>
+                </div>
+                
+                {/* Icon Background - Animated on Hover */}
+                <div className="absolute top-4 right-4 text-white/20 text-7xl transition-all duration-500 group-hover:scale-125 group-hover:rotate-12 group-hover:text-white/30">
+                  {item.icon}
+                </div>
+              </div>
+
+              {/* Bottom Interactive Bar */}
+              <button className="w-full bg-black/20 py-3 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-black/40 transition-all">
+                {item.footerText} <FaArrowCircleRight className="group-hover:translate-x-2 transition-transform" />
+              </button>
+            </div>
+          ))}
+        </div>
+
+
+        <div className="mt-16">
+          <Footer1 />
+        </div>
       </div>
     </>
   );

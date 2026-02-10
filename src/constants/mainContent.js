@@ -1,27 +1,17 @@
 import axios from "axios";
-import logo from "../assets/images/pharma-logo.png";
+import logo from "../assets/images/logoe.png";
 
 export const MainContent = {
-  name: "Pharama Satti",
+  name: "E-Commerce-Site",
   logo: logo,
 };
 export const backendConfig = {
-  // base: "http://192.168.29.191:8080/api",
-  // origin: "http://192.168.29.191:8080",
-  // base: "http://172.20.10.2:8080/api",
-  // origin: "http://172.20.10.2:8080",
-  // origin: "https://api.bionova.ai",
-  base: "http://localhost:5000/api/v1",
-  // base: "https://api.bionova.ai/api",
-  // origin: "https://api.bionova.ai",
-    //  base: "http://localhost:8000",
-
-
+  base: "http://localhost:8000/api"
 };
 
 const token = localStorage.getItem("token");
 export const Axios = axios.create({
-  baseURL:"http://localhost:5000/api/v1",
+  baseURL:"http://localhost:8000/api",
   withCredentials: true,
   headers: {
     Authorization: `Bearer ${token}`,

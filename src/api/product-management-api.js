@@ -12,7 +12,7 @@ export async function addCategoryType(payload) {
 }
 
 export async function editCategoryType(payload, id) {
-  const response = await Axios.post(`${apiUrl}/create-category/${id}`, payload);
+  const response = await Axios.post(`${apiUrl}/edit-category/${id}`, payload);
   return response?.data;
 }
 
@@ -50,7 +50,7 @@ export async function addBanner(payload) {
 }
 
 export async function getDetails() {
-  const response = await Axios.get(`${apiUrl}/get-details`);
+  const response = await Axios.get(`${apiUrl}/get-banners`);
   return response?.data;
 }
 
@@ -192,12 +192,12 @@ export const getAttributeById = async (id) => {
 };
 
 export const updateAttribute = async (id, payload) => {
-  const response = await Axios.put(`${apiUrl}/${id}`, payload);
+  const response = await Axios.put(`${apiUrl}/update/${id}`, payload);
   return response?.data;
 };
 
 export const deleteAttribute = async (id) => {
-  const response = await Axios.delete(`${apiUrl}/${id}`);
+  const response = await Axios.delete(`${apiUrl}/delete/${id}`);
   return response?.data;
 };
 

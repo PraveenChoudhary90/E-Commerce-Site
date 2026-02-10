@@ -6,8 +6,6 @@ import { getCategories, updateItem, deleteItem } from "../api/auth-api";
 
 const ProductCard = () => {
   const [items, setItems] = useState([]);
-  const [isCategoryList, setIsCategoryList] = useState(false);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
@@ -15,11 +13,12 @@ const ProductCard = () => {
     name: "",
     description: "",
     product_mrp: "",
-    franchisee_price: "",
+    user_price: "",
     gst_in_percentage: "",
-    stock: "",
-    image: null,
   });
+
+  const [currentImages, setCurrentImages] = useState([]); // Existing images
+  const [newImages, setNewImages] = useState([]); // New uploaded images
 
   useEffect(() => {
     fetchData();
@@ -28,129 +27,128 @@ const ProductCard = () => {
   const fetchData = async () => {
     try {
       const res = await getCategories();
-      const arr = Array.isArray(res)
-        ? res
-        : Array.isArray(res?.data)
-        ? res.data
-        : Array.isArray(res?.data?.data)
-        ? res.data.data
-        : [];
-
-      const looksLikeCategories =
-        arr.length > 0 &&
-        arr.every((it) => it && (it.name || it._id) && !it.combination);
-
+      let arr = [];
+      if (res) {
+        if (Array.isArray(res)) arr = res;
+        else if (Array.isArray(res.data)) arr = res.data;
+        else if (Array.isArray(res.data?.data)) arr = res.data.data;
+      }
       setItems(arr);
-      setIsCategoryList(looksLikeCategories);
     } catch (error) {
       console.error(error);
     }
   };
 
-  const getImageSrc = (el) => {
-    if (Array.isArray(el?.images) && el.images.length > 0) {
-      return el.images[0]?.url;
-    }
-    return "https://via.placeholder.com/80x60?text=No+Image";
-  };
-
   const handleEdit = (item) => {
     setSelectedItem(item);
     setFormData({
-      name: item.name || item.combination || "",
-      description: item.detail_description || "",
+      name: item.name || "",
+      description: item.description || "",
       product_mrp: item.product_mrp || "",
-      franchisee_price: item.franchisee_price || "",
+      user_price: item.user_price || "",
       gst_in_percentage: item.gst_in_percentage || "",
-      stock: item.stock || "",
-      image: null,
     });
+
+    setCurrentImages(item.images || []); // Existing images
+    setNewImages([]); // Reset new uploads
     setIsModalOpen(true);
   };
 
-  // 🔹 UPDATE PRODUCT (ImageKit supported)
+  const handleDeleteImage = (index) => {
+    setCurrentImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleNewImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    setNewImages((prev) => [...prev, ...files]);
+  };
+
   const handleUpdate = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const data = new FormData();
-  data.append("name", formData.name);
-  data.append("description", formData.description);
-  data.append("product_mrp", formData.product_mrp);
-  data.append("franchisee_price", formData.franchisee_price);
-  data.append("gst_in_percentage", formData.gst_in_percentage);
-  data.append("stock", formData.stock);
-  if (formData.image) data.append("image", formData.image);
-
-  try {
-    const updatedItem = await updateItem(selectedItem._id, data);
-
-    // 🔹 If API returns full updated product
-    if (updatedItem && updatedItem._id) {
-      setItems((prev) =>
-        prev.map((it) => (it._id === updatedItem._id ? updatedItem : it))
-      );
-    } else {
-      // 🔹 If API returns partial object, fetch full product
-      const res = await getCategories(); // or fetch single product API if available
-      setItems(res);
+    if (formData.gst_in_percentage < 0 || formData.gst_in_percentage > 100) {
+      Swal.fire("Invalid GST", "GST must be between 0 and 100%", "warning");
+      return;
     }
 
-    setIsModalOpen(false);
-    setSelectedItem(null);
+    const data = new FormData();
+    data.append("name", formData.name);
+    data.append("description", formData.description);
+    data.append("product_mrp", formData.product_mrp);
+    data.append("user_price", formData.user_price);
+    data.append("gst_in_percentage", formData.gst_in_percentage);
 
-    Swal.fire({
-      icon: "success",
-      title: "Updated!",
-      text: "Product updated successfully.",
-      timer: 1500,
-      showConfirmButton: false,
-    });
-  } catch (error) {
-    console.error(error);
-    Swal.fire({
-      icon: "error",
-      title: "Update Failed",
-      text: "Something went wrong while updating product.",
-    });
-  }
-};
+    // Send remaining existing images URLs
+    data.append("existingImages", JSON.stringify(currentImages));
 
+    // Send new images
+    newImages.forEach((img) => data.append("images", img));
 
-  // 🔹 DELETE PRODUCT
+    try {
+      const updatedItem = await updateItem(selectedItem._id, data);
+
+      if (updatedItem && updatedItem._id) {
+        setItems((prev) =>
+          prev.map((it) => (it._id === updatedItem._id ? updatedItem : it))
+        );
+      } else {
+        fetchData();
+      }
+
+      setIsModalOpen(false);
+      setSelectedItem(null);
+      setCurrentImages([]);
+      setNewImages([]);
+
+      Swal.fire({
+        icon: "success",
+        title: "Updated!",
+        text: "Product updated successfully.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: "Update Failed",
+        text: "Something went wrong while updating product.",
+      });
+    }
+  };
+
   const handleDelete = async (id) => {
-  const result = await Swal.fire({
-    title: "Are you sure?",
-    text: "This product will be removed from the list!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Yes, delete it!",
-  });
-
-  if (!result.isConfirmed) return;
-
-  try {
-    await deleteItem(id);
-
-    setItems((prev) => prev.filter((it) => it._id !== id));
-
-    Swal.fire({
-      icon: "success",
-      title: "Deleted!",
-      text: "Product has been deleted successfully.",
-      timer: 1500,
-      showConfirmButton: false,
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "This product will be removed from the list!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
     });
-  } catch (error) {
-    Swal.fire({
-      icon: "error",
-      title: "Error",
-      text: "Something went wrong while deleting.",
-    });
-  }
-};
 
+    if (!result.isConfirmed) return;
+
+    try {
+      await deleteItem(id);
+      setItems((prev) => prev.filter((it) => it._id !== id));
+
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: "Product has been deleted successfully.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Something went wrong while deleting.",
+      });
+    }
+  };
 
   return (
     <div className="w-full overflow-x-auto p-4">
@@ -162,18 +160,12 @@ const ProductCard = () => {
             <tr className="text-sm text-gray-600 text-left">
               <th className="p-3 border">Index</th>
               <th className="p-3 border">Image</th>
-              <th className="p-3 border">
-                {isCategoryList ? "Category Name" : "Product Name"}
-              </th>
-              {!isCategoryList && (
-                <>
-                  <th className="p-3 border">Description</th>
-                  <th className="p-3 border">MRP</th>
-                  <th className="p-3 border">Vendor Price</th>
-                  <th className="p-3 border">GST</th>
-                  <th className="p-3 border">Stock</th>
-                </>
-              )}
+              <th className="p-3 border">Product Name</th>
+              <th className="p-3 border">Description</th>
+              <th className="p-3 border">MRP</th>
+              <th className="p-3 border">User Price</th>
+              <th className="p-3 border">GST</th>
+              <th className="p-3 border">Attributes</th>
               <th className="p-3 border">Actions</th>
             </tr>
           </thead>
@@ -182,33 +174,51 @@ const ProductCard = () => {
               <tr key={el._id} className="hover:bg-gray-50">
                 <td className="p-3 border">{index + 1}</td>
                 <td className="p-3 border">
-                  <img
-                    src={getImageSrc(el)}
-                    alt=""
-                    className="w-16 h-12 object-cover rounded"
-                  />
+                  {Array.isArray(el.images) && el.images.length > 0 ? (
+                    <div className="flex gap-2 flex-wrap">
+                      {el.images.map((img, i) => (
+                        <img
+                          key={i}
+                          src={img}
+                          alt={`product-${i}`}
+                          className="w-24 h-16 object-cover rounded-lg shadow-md"
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <img
+                      src="https://via.placeholder.com/80x60?text=No+Image"
+                      alt="No Image"
+                      className="w-24 h-16 object-cover rounded-lg shadow-md"
+                    />
+                  )}
                 </td>
                 <td className="p-3 border font-medium">
                   <Link
                     to={`/products/${el._id}`}
                     className="text-blue-600 hover:underline"
                   >
-                    {isCategoryList ? el?.name ?? "-" : el?.combination ?? "-"}
+                    {el.name || "NA"}
                   </Link>
                 </td>
-                {!isCategoryList && (
-                  <>
-                    <td className="p-3 border text-sm text-gray-600">
-                      {el.detail_description || "-"}
-                    </td>
-                    <td className="p-3 border">₹{el.product_mrp}</td>
-                    <td className="p-3 border text-green-700 font-semibold">
-                      ₹{el.franchisee_price}
-                    </td>
-                    <td className="p-3 border">{el.gst_in_percentage}%</td>
-                    <td className="p-3 border">{el.stock}</td>
-                  </>
-                )}
+                <td className="p-3 border text-sm text-gray-600">
+                  {el.description || "NA"}
+                </td>
+                <td className="p-3 border">₹{el.product_mrp || "NA"}</td>
+                <td className="p-3 border text-green-700 font-semibold">
+                  ₹{el.user_price || "NA"}
+                </td>
+                <td className="p-3 border">{el.gst_in_percentage || "NA"}%</td>
+                <td className="p-3 border">
+                  {Array.isArray(el.attributes) && el.attributes.length > 0
+                    ? el.attributes
+                        .map(
+                          (attr) =>
+                            `${attr.attribute.name}: ${attr.values.join(", ")}`
+                        )
+                        .join(" | ")
+                    : "NA"}
+                </td>
                 <td className="p-3 border">
                   <div className="flex gap-3">
                     <button
@@ -237,7 +247,7 @@ const ProductCard = () => {
           <div className="bg-white w-full max-w-md rounded-lg p-6 max-h-[90vh] overflow-y-auto">
             <h2 className="text-lg font-semibold mb-4">Update Product</h2>
             <form onSubmit={handleUpdate} className="space-y-4">
-              {/* Name */}
+              {/* Product Name */}
               <div>
                 <label className="block text-sm font-medium">Product Name</label>
                 <input
@@ -249,14 +259,13 @@ const ProductCard = () => {
                   }
                 />
               </div>
+
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium">
-                  Detailed Description
-                </label>
+                <label className="block text-sm font-medium">Description</label>
                 <textarea
                   className="w-full border p-2 rounded"
-                  placeholder="Enter detailed description"
+                  placeholder="Enter description"
                   rows={4}
                   value={formData.description}
                   onChange={(e) =>
@@ -264,6 +273,7 @@ const ProductCard = () => {
                   }
                 />
               </div>
+
               {/* MRP */}
               <div>
                 <label className="block text-sm font-medium">MRP (₹)</label>
@@ -276,20 +286,20 @@ const ProductCard = () => {
                   }
                 />
               </div>
-              {/* Franchisee Price */}
+
+              {/* User Price */}
               <div>
-                <label className="block text-sm font-medium">
-                  Vendor Price (₹)
-                </label>
+                <label className="block text-sm font-medium">User Price (₹)</label>
                 <input
                   type="number"
                   className="w-full border p-2 rounded"
-                  value={formData.franchisee_price}
+                  value={formData.user_price}
                   onChange={(e) =>
-                    setFormData({ ...formData, franchisee_price: e.target.value })
+                    setFormData({ ...formData, user_price: e.target.value })
                   }
                 />
               </div>
+
               {/* GST */}
               <div>
                 <label className="block text-sm font-medium">GST (%)</label>
@@ -298,52 +308,73 @@ const ProductCard = () => {
                   className="w-full border p-2 rounded"
                   value={formData.gst_in_percentage}
                   onChange={(e) =>
-                    setFormData({ ...formData, gst_in_percentage: e.target.value })
+                    setFormData({
+                      ...formData,
+                      gst_in_percentage: e.target.value,
+                    })
                   }
                 />
               </div>
-              {/* Stock */}
+
+              {/* Existing Images with Delete */}
               <div>
-                <label className="block text-sm font-medium">Stock Quantity</label>
-                <input
-                  type="number"
-                  className="w-full border p-2 rounded"
-                  value={formData.stock}
-                  onChange={(e) =>
-                    setFormData({ ...formData, stock: e.target.value })
-                  }
-                />
+                <label className="block text-sm font-medium">Existing Images</label>
+                <div className="flex gap-2 flex-wrap mt-2">
+                  {currentImages.map((img, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={img}
+                        alt={`existing-${index}`}
+                        className="w-24 h-16 object-cover rounded-lg shadow-md"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteImage(index)}
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
-              {/* Image */}
-              <div>
-                <label className="block text-sm font-medium">Product Image</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="w-full border p-2 rounded"
-                  onChange={(e) =>
-                    setFormData({ ...formData, image: e.target.files[0] })
-                  }
-                />
-              </div>
-              {/* Preview */}
-              <div className="flex gap-3">
-                {selectedItem?.images?.[0]?.url && !formData.image && (
-                  <img
-                    src={selectedItem.images[0].url}
-                    alt="old"
-                    className="w-20 h-16 object-cover rounded"
-                  />
-                )}
-                {formData.image && (
-                  <img
-                    src={URL.createObjectURL(formData.image)}
-                    alt="preview"
-                    className="w-20 h-16 object-cover rounded"
-                  />
-                )}
-              </div>
-              {/* Buttons */}
+
+              {/* New Image Upload */}
+              {/* New Image Upload */}
+<div>
+  <label className="block text-sm font-medium">Add New Images</label>
+  <input
+    type="file"
+    multiple
+    accept="image/*"
+    onChange={handleNewImageUpload}
+    className="w-full border p-2 rounded mt-2"
+  />
+  <div className="flex gap-2 flex-wrap mt-2">
+    {newImages.map((img, index) => (
+      <div key={index} className="relative">
+        <img
+          src={URL.createObjectURL(img)}
+          alt={`new-${index}`}
+          className="w-24 h-16 object-cover rounded-lg shadow-md"
+        />
+        {/* Delete button for new image */}
+        <button
+          type="button"
+          onClick={() =>
+            setNewImages((prev) => prev.filter((_, i) => i !== index))
+          }
+          className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+        >
+          ×
+        </button>
+      </div>
+    ))}
+  </div>
+</div>
+
+
+              {/* Submit Buttons */}
               <div className="flex justify-end gap-3 pt-4 pb-6">
                 <button
                   type="button"
