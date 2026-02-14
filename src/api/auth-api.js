@@ -8,11 +8,11 @@ export async function loginWithEmailAdmin(payload) {
   return response?.data;
 }
 
-// export async function loginWithEmailAdmin(payload) {
-//     const response = await Axios.post(`${apiUrl}/login`, payload);
-//     return response.data;
+export async function ChangePassword(payload) {
+    const response = await Axios.put(`${apiUrl}/change-password`, payload);
+    return response.data;
 
-// }
+}
 
 export async function getAdminInfo() {
   const response = await Axios.get(`${apiUrl}/get-admin`);

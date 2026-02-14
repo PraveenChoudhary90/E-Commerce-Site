@@ -149,7 +149,7 @@ const BannerList = () => {
                                         <td className="p-3 text-center">{banner.images.length}</td>
                                         <td className="p-3 text-center">
                                             <div className="flex gap-2 justify-center">
-                                                <button
+                                                {/* <button
                                                     className="p-2 rounded text-blue-600 bg-blue-100"
                                                     onClick={() => {
                                                         setSelectedBanner(banner);
@@ -157,7 +157,7 @@ const BannerList = () => {
                                                     }}
                                                 >
                                                     <FaRegEye />
-                                                </button>
+                                                </button> */}
                                                 <button
                                                     className="p-2 rounded text-blue-600 bg-blue-100"
                                                     onClick={() => {

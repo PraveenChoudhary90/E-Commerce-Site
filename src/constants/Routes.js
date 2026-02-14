@@ -47,5 +47,6 @@ export const Routers = {
   HISTORY:"/order-history",
   ProductDisplay:"/ProductDisplay",
   AllIncome:"/All-Income",
-  UserList:"/UserList"
+  UserList:"/UserList",
+  ChangePasswordadmin:"/ChangePasswordadmin"
 };

@@ -210,15 +210,22 @@ const ProductCard = () => {
                 </td>
                 <td className="p-3 border">{el.gst_in_percentage || "NA"}%</td>
                 <td className="p-3 border">
-                  {Array.isArray(el.attributes) && el.attributes.length > 0
-                    ? el.attributes
-                        .map(
-                          (attr) =>
-                            `${attr.attribute.name}: ${attr.values.join(", ")}`
-                        )
-                        .join(" | ")
-                    : "NA"}
-                </td>
+  {Array.isArray(el.attributes) && el.attributes.length > 0
+    ? el.attributes
+        .map((attr) => {
+          if (!attr?.attribute?.name) return null;
+
+          const values = Array.isArray(attr.values)
+            ? attr.values.join(", ")
+            : "";
+
+          return `${attr.attribute.name}: ${values}`;
+        })
+        .filter(Boolean)
+        .join(" | ")
+    : "NA"}
+</td>
+
                 <td className="p-3 border">
                   <div className="flex gap-3">
                     <button

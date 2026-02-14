@@ -54,6 +54,7 @@ const Layout = () => {
     // { path: Routers.EARNING_MANAGEMENT, label: "Accounts", icon: <GrMoney /> },
     { path: Routers.ADD_COUPON, label: "Offer Management", icon: <RiCoupon2Line /> },
     // { path: Routers.MANAGE_MEMBERS, label: "MR Management", icon: <MdManageAccounts /> },
+    { path: Routers.ChangePasswordadmin, label: "Change Password", icon: <MdManageAccounts /> },
   ];
 
   const actionButtons = [

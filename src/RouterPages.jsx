@@ -41,6 +41,7 @@ import OrderHistory from "./pages/OrderDetailPage";
 import ProductCard from "./pages/AllProductDataAdd";
 import MyIncome from "./MyIncome";
 import UserList from "./pages/AllUser";
+import ChangePasswordadmin from "./pages/ChangePasword";
 
 const RoutersPages = () => {
   // Redux se login status check karo
@@ -97,6 +98,7 @@ const RoutersPages = () => {
               <Route path={Routers.MarketingToolAllImages} element={<AllGetImages />} />
               <Route path={Routers.MarketingToolAllPdf} element={<AllGetPdf />} />
               <Route path={Routers.UserList} element={<UserList/>}/>
+              <Route path={Routers.ChangePasswordadmin} element={<ChangePasswordadmin/>}/>
             </Route>
 
             {/* 404 & fallback */}
