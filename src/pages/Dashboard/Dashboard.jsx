@@ -24,7 +24,7 @@ const Dashboard = () => {
     },
     {
       title: "Total Sales",
-      value: "5,80,200",
+      value: "5,8200",
       icon: <FaChartLine />,
       color: "bg-gradient-to-r from-emerald-500 to-green-600",
       footerText: "View report",

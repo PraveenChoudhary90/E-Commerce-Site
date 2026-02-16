@@ -65,7 +65,7 @@ const ChangePasswordadmin = () => {
     <div className="min-h-[80vh] flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
         {/* Header Decor */}
-        <div className="bg-blue-600 p-6 text-center text-white">
+        <div className="bg-green-900 p-6 text-center text-white">
           <div className="inline-flex p-3 bg-white/20 rounded-full mb-3">
             <ShieldCheck size={32} />
           </div>
@@ -155,7 +155,7 @@ const ChangePasswordadmin = () => {
             type="submit"
             disabled={loading}
             className={`w-full py-3 rounded-lg font-bold text-white shadow-md transition transform active:scale-[0.98] ${
-              loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 hover:shadow-lg"
+              loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-900 hover:bg-blue-700 hover:shadow-lg"
             }`}
           >
             {loading ? (

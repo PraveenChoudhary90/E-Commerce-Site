@@ -48,5 +48,5 @@ export const Routers = {
   ProductDisplay:"/ProductDisplay",
   AllIncome:"/All-Income",
   UserList:"/UserList",
-  ChangePasswordadmin:"/ChangePasswordadmin"
+  ChangePassword:"/ChangePassword"
 };

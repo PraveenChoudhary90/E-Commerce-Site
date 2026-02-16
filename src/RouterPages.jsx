@@ -98,7 +98,7 @@ const RoutersPages = () => {
               <Route path={Routers.MarketingToolAllImages} element={<AllGetImages />} />
               <Route path={Routers.MarketingToolAllPdf} element={<AllGetPdf />} />
               <Route path={Routers.UserList} element={<UserList/>}/>
-              <Route path={Routers.ChangePasswordadmin} element={<ChangePasswordadmin/>}/>
+              <Route path={Routers.ChangePassword} element={<ChangePasswordadmin/>}/>
             </Route>
 
             {/* 404 & fallback */}
