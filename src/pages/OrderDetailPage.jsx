@@ -308,6 +308,7 @@ const OrderHistory = () => {
         <table className="w-full mb-8">
           <thead>
             <tr className="bg-blue-900 text-white text-[11px] uppercase tracking-wider">
+              <th className="py-3 px-4 text-left font-medium">images</th>
               <th className="py-3 px-4 text-left font-medium">Description</th>
               <th className="py-3 px-4 text-center font-medium">Qty</th>
               <th className="py-3 px-4 text-right font-medium">Unit Price</th>
@@ -315,18 +316,29 @@ const OrderHistory = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 border-b border-gray-200">
-            {selectedOrder.products.map((p, i) => (
-              <tr key={i}>
-                <td className="py-5 px-4 text-sm">
-                  <p className="font-bold text-gray-900">{p.name}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{p.brand || 'Premium Quality'}</p>
-                </td>
-                <td className="py-5 px-4 text-center text-sm text-gray-600">{p.qty}</td>
-                <td className="py-5 px-4 text-right text-sm text-gray-600">₹{p.user_price.toLocaleString()}</td>
-                <td className="py-5 px-4 text-right text-sm font-bold text-gray-900">₹{(p.qty * p.user_price).toLocaleString()}</td>
-              </tr>
-            ))}
-          </tbody>
+  {selectedOrder.products.map((p, i) => (
+    <tr key={i}>
+      <td className="py-2 px-4">
+        {p.images?.[0] && (
+          <img
+            src={p.images[0]}
+            alt={p.name}
+            className="w-12 h-12 object-cover rounded border"
+            crossOrigin="anonymous"
+          />
+        )}
+      </td>
+      <td className="py-5 px-4 text-sm">
+        <p className="font-bold text-gray-900">{p.name}</p>
+        <p className="text-xs text-gray-500 mt-0.5">{p.brand || 'Premium Quality'}</p>
+      </td>
+      <td className="py-5 px-4 text-center text-sm text-gray-600">{p.qty}</td>
+      <td className="py-5 px-4 text-right text-sm text-gray-600">₹{p.user_price.toLocaleString()}</td>
+      <td className="py-5 px-4 text-right text-sm font-bold text-gray-900">₹{(p.qty * p.user_price).toLocaleString()}</td>
+    </tr>
+  ))}
+</tbody>
+
         </table>
 
         {/* Summary Calculation */}
