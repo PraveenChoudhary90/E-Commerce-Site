@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { getCategories, updateItem, deleteItem } from "../api/auth-api";
+import Footer1 from "../components/Footer1";
 
 const ProductCard = () => {
   const [items, setItems] = useState([]);
@@ -195,7 +196,7 @@ const ProductCard = () => {
                 </td>
                 <td className="p-3 border font-medium">
                   <Link
-                    to={`/products/${el._id}`}
+                    // to={`/products/${el._id}`}
                     className="text-blue-600 hover:underline"
                   >
                     {el.name || "NA"}
@@ -247,6 +248,8 @@ const ProductCard = () => {
           </tbody>
         </table>
       )}
+
+      <Footer1/>
 
       {/* UPDATE MODAL */}
       {isModalOpen && (

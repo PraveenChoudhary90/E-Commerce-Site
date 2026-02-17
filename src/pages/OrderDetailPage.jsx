@@ -5,6 +5,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import PageLoader from "../components/ui/PageLoader";
 import Swal from "sweetalert2";
+import Footer1 from "../components/Footer1";
 
 const OrderHistory = () => {
   const [filter, setFilter] = useState("all");
@@ -221,6 +222,7 @@ const OrderHistory = () => {
           <p className="text-gray-600 mt-4 text-center">No orders found.</p>
         )}
       </div>
+      <Footer1/>
 
 
 
