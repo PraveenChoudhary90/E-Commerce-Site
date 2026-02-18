@@ -9,7 +9,7 @@ const VerifyBankDetails = () => {
                 <div className='flex items-center justify-between'>
                     <img
                         src={MainContent.logo}
-                        alt="Bionova Logo"
+                        alt="Rivo Logo"
                         className="md:w-[160px] w-[100px] h-auto"
                     />
                     <h1 className='md:text-2xl sm:text-xl font-medium text-bg-color'>Verify Bank Details</h1>

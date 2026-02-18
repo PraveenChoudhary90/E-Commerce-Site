@@ -5,7 +5,7 @@ const CheckoutPage = () => {
         {
             id: 1,
             name: "Gradient Graphic T-shirt",
-            manufacturer: "Bionova Healthcare Company",
+            manufacturer: "Rivo Healthcare Company",
             composition: "Amiodarone (100mg)",
             price: 500,
             quantity: 1,
@@ -14,7 +14,7 @@ const CheckoutPage = () => {
         {
             id: 2,
             name: "Gradient Graphic T-shirt",
-            manufacturer: "Bionova Healthcare Company",
+            manufacturer: "Rivo Healthcare Company",
             composition: "Amiodarone (100mg)",
             price: 500,
             quantity: 1,
@@ -23,7 +23,7 @@ const CheckoutPage = () => {
         {
             id: 3,
             name: "Gradient Graphic T-shirt",
-            manufacturer: "Bionova Healthcare Company",
+            manufacturer: "Rivo Healthcare Company",
             composition: "Amiodarone (100mg)",
             price: 500,
             quantity: 1,

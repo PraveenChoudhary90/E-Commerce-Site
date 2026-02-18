@@ -17,7 +17,7 @@ const Register = () => {
                 <div className="flex justify-center mb-6">
                     <img
                         src={MainContent.logo}
-                        alt="Bionova Logo"
+                        alt="Rivo Logo"
                         className="w-[200px] h-auto"
                     />
                 </div>

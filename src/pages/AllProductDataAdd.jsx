@@ -4,6 +4,7 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { getCategories, updateItem, deleteItem } from "../api/auth-api";
 import Footer1 from "../components/Footer1";
+import { updateBestSellerStatus } from "../api/product-management-api";
 
 const ProductCard = () => {
   const [items, setItems] = useState([]);
@@ -151,6 +152,44 @@ const ProductCard = () => {
     }
   };
 
+
+
+const handleBestSeller = async (id, value) => {
+  try {
+    const response = await updateBestSellerStatus(id, {
+      isBestSeller: value,
+    });
+
+    if (response?.success) {
+      // response.data array hai, product nikalna
+      const updatedProduct = response.data.find(
+        (item) => item._id === id
+      );
+
+      if (updatedProduct) {
+        setItems((prev) =>
+          prev.map((item) =>
+            item._id === id ? updatedProduct : item
+          )
+        );
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "Updated",
+        text: "Best Seller status updated",
+        timer: 1200,
+        showConfirmButton: false,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    Swal.fire("Error", "Something went wrong", "error");
+  }
+};
+
+
+
   return (
     <div className="w-full overflow-x-auto p-4">
       {items.length === 0 ? (
@@ -167,6 +206,7 @@ const ProductCard = () => {
               <th className="p-3 border">User Price</th>
               <th className="p-3 border">GST</th>
               <th className="p-3 border">Attributes</th>
+              <th className="p-3 border">Best Selling Product</th>
               <th className="p-3 border">Actions</th>
             </tr>
           </thead>
@@ -226,6 +266,16 @@ const ProductCard = () => {
         .join(" | ")
     : "NA"}
 </td>
+<td className="p-3 border text-center">
+  <input
+    type="checkbox"
+    checked={el.isBestSeller || false}
+    onChange={(e) =>
+      handleBestSeller(el._id, e.target.checked)}
+      className="w-6 h-6"
+  />
+</td>
+
 
                 <td className="p-3 border">
                   <div className="flex gap-3">

@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Autoplay, Pagination } from "swiper/modules";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { FaArrowCircleRight, FaShoppingCart, FaChartLine, FaRegTimesCircle, FaUsers } from "react-icons/fa";
 
 import Footer1 from "../../components/Footer1";
 import PageLoader from "../../components/ui/PageLoader";
 import { getOrderDetails } from "../../api/auth-api";
-import Banner from "./Banner";
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(false);
@@ -27,7 +25,6 @@ const Dashboard = () => {
     fetchOrders();
   }, []);
 
-  // Calculate stats dynamically
   const today = new Date();
   const isToday = (date) => {
     const d = new Date(date);
@@ -81,28 +78,36 @@ const Dashboard = () => {
   if (loading) return <PageLoader />;
 
   return (
-    <div className="p-4 md:p-8  bg-[#f4f7f6] min-h-screen font-sans">
-      {/* --- Dynamic Banner --- */}
-      <Banner />
-
+    <div className="p-4 md:p-8 bg-[#f4f7f6] min-h-screen font-sans">
+      
       {/* --- DYNAMIC STATS CARDS --- */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-1">
         {stats.map((item, index) => (
-          <div key={index} className={`${item.color} rounded-xl shadow-lg text-white overflow-hidden relative group transition-all duration-500 transform hover:-translate-y-2 hover:shadow-2xl`}>
-            <div className="p-6">
+          <div
+            key={index}
+            className={`${item.color} rounded-xl shadow-lg text-white overflow-hidden relative group transition-all duration-500 transform hover:-translate-y-2 hover:shadow-2xl flex flex-col`}
+          >
+            <div className="p-6 flex-1">
               <div className="relative z-10">
                 <p className="text-xs font-bold opacity-80 uppercase tracking-widest mb-1">{item.title}</p>
                 <h3 className="text-4xl font-black flex items-center gap-1">
                   {item.title.toLowerCase().includes("sales") ? (
-                    <><LiaRupeeSignSolid className="text-3xl" />{item.value}</>
-                  ) : item.value}
+                    <>
+                      <LiaRupeeSignSolid className="text-3xl" />
+                      {item.value}
+                    </>
+                  ) : (
+                    item.value
+                  )}
                 </h3>
               </div>
               <div className="absolute top-4 right-4 text-white/20 text-7xl transition-all duration-500 group-hover:scale-125 group-hover:rotate-12 group-hover:text-white/30">
                 {item.icon}
               </div>
             </div>
-            <button className="w-full bg-black/20 py-3 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-black/40 transition-all">
+
+            {/* Button always at bottom */}
+            <button className="w-full bg-black/20 py-3 text-sm font-semibold flex items-center justify-center gap-2 mt-auto hover:bg-black/40 transition-all">
               {item.footerText} <FaArrowCircleRight className="group-hover:translate-x-2 transition-transform" />
             </button>
           </div>

@@ -28,6 +28,13 @@ export async function deleteVariant(id) {
 }
 
 
+// Update Best Seller Status
+export const updateBestSellerStatus = async (id, payload) => {
+    const response = await Axios.put(`${apiUrl}/best-selling-product/${id}`,payload);
+  return response?.data;
+  };
+
+
 
 export async function addCategoryBrand(payload) {
   const response = await Axios.post(`${apiUrl}/create-brand`, payload);

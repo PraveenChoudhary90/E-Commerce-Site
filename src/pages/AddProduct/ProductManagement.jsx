@@ -18,7 +18,7 @@ const ProductManagement = () => {
     const Asthmatic = [
         {
             type: "Pill",
-            brand: "Bionova Healthcare Limited",
+            brand: "Rivo Healthcare Limited",
             names: ["INH AIRFLOW 250", "Galaxy 250"],
         },
         {
@@ -33,7 +33,7 @@ const ProductManagement = () => {
         },
         {
             type: "Pill",
-            brand: "Bionova Healthcare Limited",
+            brand: "Rivo Healthcare Limited",
             names: ["INH AIRFLOW 250", "Galaxy 250"],
         },
         {
@@ -87,7 +87,7 @@ const ProductManagement = () => {
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <InputField type="text" placeholder={'Bionova Healthcare Limited'} label={'Brand'} />
+                        <InputField type="text" placeholder={'Rivo Healthcare Limited'} label={'Brand'} />
                         <div className="flex gap-4 items-center justify-end ">
                             <Button bgcolor={'bg-[#2C6AE5]'} title={'View Image'} icon={<IoEyeOutline />
                             } />
