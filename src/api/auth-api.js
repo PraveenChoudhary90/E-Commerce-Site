@@ -27,7 +27,25 @@ export async function getDashboardDetails() {
 
 
 
+export async function getAllReviewsAdmin() {
+  const response = await Axios.get(`${apiUrl}/reviews`);
+  return response.data;
+}
 
+export async function deleteReviewAdmin(productId, reviewId) {
+  const response = await Axios.delete(
+    `${apiUrl}/reviews/${productId}/${reviewId}`
+  );
+  return response.data;
+}
+
+export async function editReviewAdmin(productId, reviewId, payload) {
+  const response = await Axios.put(
+    `${apiUrl}/reviews/${productId}/${reviewId}`,
+    payload
+  );
+  return response.data;
+}
 
 
 export async function getOrderDetails() {

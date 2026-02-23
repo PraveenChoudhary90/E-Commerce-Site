@@ -126,7 +126,7 @@ const OrderHistory = () => {
           >
             <option value="all">All Orders</option>
             <option value="pending">Pending</option>
-            <option value="SUCCESS">Success</option>
+            <option value="paid">Success</option>
             <option value="failed">Failed</option>
           </select>
 
