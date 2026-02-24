@@ -38,7 +38,8 @@ const OrderHistory = () => {
     const nameMatch = order.user?.name?.toLowerCase().includes(searchValue);
     const emailMatch = order.user?.email?.toLowerCase().includes(searchValue);
     const phoneMatch = order.user?.number?.toLowerCase().includes(searchValue);
-    return statusMatch && (nameMatch || emailMatch || phoneMatch);
+    const invoceMatch = order.invoiceNumber?.toLowerCase().includes(searchValue);
+    return statusMatch && (nameMatch || emailMatch || phoneMatch || invoceMatch);
   });
 
   // Download PDF (multi-page safe)
