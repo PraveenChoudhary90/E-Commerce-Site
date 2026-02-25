@@ -6,6 +6,7 @@ import {
   editReviewAdmin,
   getAllReviewsAdmin,
 } from "../api/auth-api";
+import Footer1 from "../components/Footer1";
 
 const GetAllReviews = () => {
   const [reviews, setReviews] = useState([]);
@@ -84,7 +85,15 @@ const GetAllReviews = () => {
     }
   };
 
-  if (loading) return <PageLoader />;
+  if (loading)
+    return (
+      <div className="min-h-screen flex flex-col">
+        <div className="flex-grow flex items-center justify-center">
+          <PageLoader />
+        </div>
+        <Footer1 />
+      </div>
+    );
 
   const filteredReviews =
     filterRating === "all"
@@ -92,130 +101,137 @@ const GetAllReviews = () => {
       : reviews.filter((r) => r.rating === Number(filterRating));
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-semibold mb-4">All Product Reviews</h1>
+    <div className="min-h-screen flex flex-col">
+      
+      {/* Main Content */}
+      <div className="flex-grow p-4">
+        <h1 className="text-xl font-semibold mb-4">All Product Reviews</h1>
 
-      {/* Rating Filter */}
-      <div className="flex gap-4 mb-4">
-        <select
-          className="p-2 border border-gray-300 rounded"
-          value={filterRating}
-          onChange={(e) => setFilterRating(e.target.value)}
-        >
-          <option value="all">All Ratings</option>
-          <option value="5">5 Stars</option>
-          <option value="4">4 Stars</option>
-          <option value="3">3 Stars</option>
-          <option value="2">2 Stars</option>
-          <option value="1">1 Star</option>
-        </select>
-      </div>
-
-      {/* Reviews Table */}
-      {filteredReviews.length === 0 ? (
-        <p>No reviews found.</p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full border border-gray-300 text-center">
-            <thead className="bg-gray-200">
-              <tr>
-                <th className="border px-4 py-2">#</th>
-                <th className="border px-4 py-2">Product</th>
-                <th className="border px-4 py-2">User</th>
-                <th className="border px-4 py-2">Rating</th>
-                <th className="border px-4 py-2">Comment</th>
-                <th className="border px-4 py-2">Avatar</th>
-                <th className="border px-4 py-2">Created At</th>
-                <th className="border px-4 py-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredReviews.map((rev, idx) => (
-                <tr key={rev.reviewId}>
-                  <td className="border px-2 py-1">{idx + 1}</td>
-                  <td className="border px-2 py-1">{rev.productName}</td>
-                  <td className="border px-2 py-1">{rev.username}</td>
-                  <td className="border px-2 py-1">{rev.rating} ⭐</td>
-                  <td className="border px-2 py-1">{rev.comment}</td>
-                  <td className="border px-2 py-1">
-                    {rev.avatar ? (
-                      <img
-                        src={rev.avatar}
-                        alt={rev.username}
-                        className="w-10 h-10 rounded object-cover mx-auto"
-                      />
-                    ) : (
-                      "N/A"
-                    )}
-                  </td>
-                  <td className="border px-2 py-1">
-                    {new Date(rev.createdAt).toLocaleString()}
-                  </td>
-                  <td className="border px-2 py-1 space-x-2">
-                    <button
-                      onClick={() => openEditModal(rev)}
-                      className="bg-blue-600 text-white px-3 py-1 rounded text-sm"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleDelete(rev.productId, rev.reviewId)
-                      }
-                      className="bg-red-600 text-white px-3 py-1 rounded text-sm"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {/* Rating Filter */}
+        <div className="flex gap-4 mb-4">
+          <select
+            className="p-2 border border-gray-300 rounded"
+            value={filterRating}
+            onChange={(e) => setFilterRating(e.target.value)}
+          >
+            <option value="all">All Ratings</option>
+            <option value="5">5 Stars</option>
+            <option value="4">4 Stars</option>
+            <option value="3">3 Stars</option>
+            <option value="2">2 Stars</option>
+            <option value="1">1 Star</option>
+          </select>
         </div>
-      )}
 
-      {/* Edit Modal */}
-      {selectedReview && (
-        <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg w-96">
-            <h2 className="text-lg font-semibold mb-4">Edit Review</h2>
+        {/* Reviews Table */}
+        {filteredReviews.length === 0 ? (
+          <p>No reviews found.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full border border-gray-300 text-center">
+              <thead className="bg-gray-200">
+                <tr>
+                  <th className="border px-4 py-2">#</th>
+                  <th className="border px-4 py-2">Product</th>
+                  <th className="border px-4 py-2">User</th>
+                  <th className="border px-4 py-2">Rating</th>
+                  <th className="border px-4 py-2">Comment</th>
+                  <th className="border px-4 py-2">Avatar</th>
+                  <th className="border px-4 py-2">Created At</th>
+                  <th className="border px-4 py-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredReviews.map((rev, idx) => (
+                  <tr key={rev.reviewId}>
+                    <td className="border px-2 py-1">{idx + 1}</td>
+                    <td className="border px-2 py-1">{rev.productName}</td>
+                    <td className="border px-2 py-1">{rev.username}</td>
+                    <td className="border px-2 py-1">{rev.rating} ⭐</td>
+                    <td className="border px-2 py-1">{rev.comment}</td>
+                    <td className="border px-2 py-1">
+                      {rev.avatar ? (
+                        <img
+                          src={rev.avatar}
+                          alt={rev.username}
+                          className="w-10 h-10 rounded object-cover mx-auto"
+                        />
+                      ) : (
+                        "N/A"
+                      )}
+                    </td>
+                    <td className="border px-2 py-1">
+                      {new Date(rev.createdAt).toLocaleString()}
+                    </td>
+                    <td className="border px-2 py-1 space-x-2">
+                      <button
+                        onClick={() => openEditModal(rev)}
+                        className="bg-blue-600 text-white px-3 py-1 rounded text-sm"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleDelete(rev.productId, rev.reviewId)
+                        }
+                        className="bg-red-600 text-white px-3 py-1 rounded text-sm"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-            <input
-              type="number"
-              min="1"
-              max="5"
-              value={editData.rating}
-              onChange={(e) =>
-                setEditData({ ...editData, rating: e.target.value })
-              }
-              className="w-full border p-2 rounded mb-3"
-            />
+        {/* Edit Modal */}
+        {selectedReview && (
+          <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
+            <div className="bg-white p-6 rounded-lg w-96">
+              <h2 className="text-lg font-semibold mb-4">Edit Review</h2>
 
-            <textarea
-              value={editData.comment}
-              onChange={(e) =>
-                setEditData({ ...editData, comment: e.target.value })
-              }
-              className="w-full border p-2 rounded mb-3"
-            />
+              <input
+                type="number"
+                min="1"
+                max="5"
+                value={editData.rating}
+                onChange={(e) =>
+                  setEditData({ ...editData, rating: e.target.value })
+                }
+                className="w-full border p-2 rounded mb-3"
+              />
 
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setSelectedReview(null)}
-                className="px-4 py-2 border rounded"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleUpdate}
-                className="px-4 py-2 bg-green-600 text-white rounded"
-              >
-                Update
-              </button>
+              <textarea
+                value={editData.comment}
+                onChange={(e) =>
+                  setEditData({ ...editData, comment: e.target.value })
+                }
+                className="w-full border p-2 rounded mb-3"
+              />
+
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => setSelectedReview(null)}
+                  className="px-4 py-2 border rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdate}
+                  className="px-4 py-2 bg-green-600 text-white rounded"
+                >
+                  Update
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
+
+      {/* Footer */}
+      <Footer1 />
     </div>
   );
 };
