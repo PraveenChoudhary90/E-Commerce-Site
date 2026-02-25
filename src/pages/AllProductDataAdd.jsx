@@ -22,6 +22,10 @@ const ProductCard = () => {
   const [currentImages, setCurrentImages] = useState([]); // Existing images
   const [newImages, setNewImages] = useState([]); // New uploaded images
 
+  // New state for image modal
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [modalImages, setModalImages] = useState([]);
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -80,10 +84,8 @@ const ProductCard = () => {
     data.append("user_price", formData.user_price);
     data.append("gst_in_percentage", formData.gst_in_percentage);
 
-    // Send remaining existing images URLs
     data.append("existingImages", JSON.stringify(currentImages));
 
-    // Send new images
     newImages.forEach((img) => data.append("images", img));
 
     try {
@@ -152,43 +154,40 @@ const ProductCard = () => {
     }
   };
 
-
-
-const handleBestSeller = async (id, value) => {
-  try {
-    const response = await updateBestSellerStatus(id, {
-      isBestSeller: value,
-    });
-
-    if (response?.success) {
-      // response.data array hai, product nikalna
-      const updatedProduct = response.data.find(
-        (item) => item._id === id
-      );
-
-      if (updatedProduct) {
-        setItems((prev) =>
-          prev.map((item) =>
-            item._id === id ? updatedProduct : item
-          )
-        );
-      }
-
-      Swal.fire({
-        icon: "success",
-        title: "Updated",
-        text: "Best Seller status updated",
-        timer: 1200,
-        showConfirmButton: false,
+  const handleBestSeller = async (id, value) => {
+    try {
+      const response = await updateBestSellerStatus(id, {
+        isBestSeller: value,
       });
+
+      if (response?.success) {
+        const updatedProduct = response.data.find((item) => item._id === id);
+
+        if (updatedProduct) {
+          setItems((prev) =>
+            prev.map((item) => (item._id === id ? updatedProduct : item))
+          );
+        }
+
+        Swal.fire({
+          icon: "success",
+          title: "Updated",
+          text: "Best Seller status updated",
+          timer: 1200,
+          showConfirmButton: false,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      Swal.fire("Error", "Something went wrong", "error");
     }
-  } catch (error) {
-    console.error(error);
-    Swal.fire("Error", "Something went wrong", "error");
-  }
-};
+  };
 
-
+  // NEW: Open modal with all images
+  const handleOpenImages = (images) => {
+    setModalImages(images);
+    setIsImageModalOpen(true);
+  };
 
   return (
     <div className="w-full overflow-x-auto p-4">
@@ -214,18 +213,16 @@ const handleBestSeller = async (id, value) => {
             {items.map((el, index) => (
               <tr key={el._id} className="hover:bg-gray-50">
                 <td className="p-3 border">{index + 1}</td>
+
+                {/* IMAGE COLUMN */}
                 <td className="p-3 border">
                   {Array.isArray(el.images) && el.images.length > 0 ? (
-                    <div className="flex gap-2 flex-wrap">
-                      {el.images.map((img, i) => (
-                        <img
-                          key={i}
-                          src={img}
-                          alt={`product-${i}`}
-                          className="w-24 h-16 object-cover rounded-lg shadow-md"
-                        />
-                      ))}
-                    </div>
+                    <img
+                      src={el.images[0]} // only first image in table
+                      alt="product"
+                      className="w-24 h-16 object-cover rounded-lg shadow-md cursor-pointer"
+                      onClick={() => handleOpenImages(el.images)}
+                    />
                   ) : (
                     <img
                       src="https://via.placeholder.com/80x60?text=No+Image"
@@ -234,11 +231,9 @@ const handleBestSeller = async (id, value) => {
                     />
                   )}
                 </td>
+
                 <td className="p-3 border font-medium">
-                  <Link
-                    // to={`/products/${el._id}`}
-                    className="text-blue-600 hover:underline"
-                  >
+                  <Link className="text-blue-600 hover:underline">
                     {el.name || "NA"}
                   </Link>
                 </td>
@@ -251,32 +246,29 @@ const handleBestSeller = async (id, value) => {
                 </td>
                 <td className="p-3 border">{el.gst_in_percentage || "NA"}%</td>
                 <td className="p-3 border">
-  {Array.isArray(el.attributes) && el.attributes.length > 0
-    ? el.attributes
-        .map((attr) => {
-          if (!attr?.attribute?.name) return null;
-
-          const values = Array.isArray(attr.values)
-            ? attr.values.join(", ")
-            : "";
-
-          return `${attr.attribute.name}: ${values}`;
-        })
-        .filter(Boolean)
-        .join(" | ")
-    : "NA"}
-</td>
-<td className="p-3 border text-center">
-  <input
-    type="checkbox"
-    checked={el.isBestSeller || false}
-    onChange={(e) =>
-      handleBestSeller(el._id, e.target.checked)}
-      className="w-6 h-6"
-  />
-</td>
-
-
+                  {Array.isArray(el.attributes) && el.attributes.length > 0
+                    ? el.attributes
+                        .map((attr) => {
+                          if (!attr?.attribute?.name) return null;
+                          const values = Array.isArray(attr.values)
+                            ? attr.values.join(", ")
+                            : "";
+                          return `${attr.attribute.name}: ${values}`;
+                        })
+                        .filter(Boolean)
+                        .join(" | ")
+                    : "NA"}
+                </td>
+                <td className="p-3 border text-center">
+                  <input
+                    type="checkbox"
+                    checked={el.isBestSeller || false}
+                    onChange={(e) =>
+                      handleBestSeller(el._id, e.target.checked)
+                    }
+                    className="w-6 h-6"
+                  />
+                </td>
                 <td className="p-3 border">
                   <div className="flex gap-3">
                     <button
@@ -299,7 +291,8 @@ const handleBestSeller = async (id, value) => {
         </table>
       )}
 
-      <Footer1/>
+      {/* FOOTER */}
+      <Footer1 />
 
       {/* UPDATE MODAL */}
       {isModalOpen && (
@@ -307,7 +300,7 @@ const handleBestSeller = async (id, value) => {
           <div className="bg-white w-full max-w-md rounded-lg p-6 max-h-[90vh] overflow-y-auto">
             <h2 className="text-lg font-semibold mb-4">Update Product</h2>
             <form onSubmit={handleUpdate} className="space-y-4">
-              {/* Product Name */}
+              {/* FORM FIELDS */}
               <div>
                 <label className="block text-sm font-medium">Product Name</label>
                 <input
@@ -320,7 +313,6 @@ const handleBestSeller = async (id, value) => {
                 />
               </div>
 
-              {/* Description */}
               <div>
                 <label className="block text-sm font-medium">Description</label>
                 <textarea
@@ -334,7 +326,6 @@ const handleBestSeller = async (id, value) => {
                 />
               </div>
 
-              {/* MRP */}
               <div>
                 <label className="block text-sm font-medium">MRP (₹)</label>
                 <input
@@ -347,7 +338,6 @@ const handleBestSeller = async (id, value) => {
                 />
               </div>
 
-              {/* User Price */}
               <div>
                 <label className="block text-sm font-medium">User Price (₹)</label>
                 <input
@@ -360,7 +350,6 @@ const handleBestSeller = async (id, value) => {
                 />
               </div>
 
-              {/* GST */}
               <div>
                 <label className="block text-sm font-medium">GST (%)</label>
                 <input
@@ -376,7 +365,7 @@ const handleBestSeller = async (id, value) => {
                 />
               </div>
 
-              {/* Existing Images with Delete */}
+              {/* EXISTING IMAGES */}
               <div>
                 <label className="block text-sm font-medium">Existing Images</label>
                 <div className="flex gap-2 flex-wrap mt-2">
@@ -399,42 +388,39 @@ const handleBestSeller = async (id, value) => {
                 </div>
               </div>
 
-              {/* New Image Upload */}
-              {/* New Image Upload */}
-<div>
-  <label className="block text-sm font-medium">Add New Images</label>
-  <input
-    type="file"
-    multiple
-    accept="image/*"
-    onChange={handleNewImageUpload}
-    className="w-full border p-2 rounded mt-2"
-  />
-  <div className="flex gap-2 flex-wrap mt-2">
-    {newImages.map((img, index) => (
-      <div key={index} className="relative">
-        <img
-          src={URL.createObjectURL(img)}
-          alt={`new-${index}`}
-          className="w-24 h-16 object-cover rounded-lg shadow-md"
-        />
-        {/* Delete button for new image */}
-        <button
-          type="button"
-          onClick={() =>
-            setNewImages((prev) => prev.filter((_, i) => i !== index))
-          }
-          className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
-        >
-          ×
-        </button>
-      </div>
-    ))}
-  </div>
-</div>
+              {/* NEW IMAGE UPLOAD */}
+              <div>
+                <label className="block text-sm font-medium">Add New Images</label>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleNewImageUpload}
+                  className="w-full border p-2 rounded mt-2"
+                />
+                <div className="flex gap-2 flex-wrap mt-2">
+                  {newImages.map((img, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={URL.createObjectURL(img)}
+                        alt={`new-${index}`}
+                        className="w-24 h-16 object-cover rounded-lg shadow-md"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setNewImages((prev) => prev.filter((_, i) => i !== index))
+                        }
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-
-              {/* Submit Buttons */}
+              {/* FORM SUBMIT */}
               <div className="flex justify-end gap-3 pt-4 pb-6">
                 <button
                   type="button"
@@ -451,6 +437,32 @@ const handleBestSeller = async (id, value) => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* SIMPLE IMAGE MODAL */}
+      {isImageModalOpen && (
+        <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50 p-4">
+          <div className="bg-white p-4 rounded-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-end">
+              <button
+                onClick={() => setIsImageModalOpen(false)}
+                className="text-red-500 font-bold text-lg"
+              >
+                ×
+              </button>
+            </div>
+            <div className="flex flex-col gap-2 mt-2">
+              {modalImages.map((img, index) => (
+                <img
+                  key={index}
+                  src={img}
+                  alt={`modal-${index}`}
+                  className="w-full object-cover rounded-lg"
+                />
+              ))}
+            </div>
           </div>
         </div>
       )}
