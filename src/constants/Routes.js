@@ -49,5 +49,6 @@ export const Routers = {
   AllIncome:"/All-Income",
   UserList:"/UserList",
   ChangePassword:"/ChangePassword",
-  Reviews:"/Reviews"
+  Reviews:"/Reviews",
+  Feedbacks:"/Feedbacks"
 };

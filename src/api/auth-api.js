@@ -48,6 +48,27 @@ export async function editReviewAdmin(productId, reviewId, payload) {
 }
 
 
+
+
+export const getAllFeedbacksAdmin = async () => {
+  const res = await Axios.get(`${apiUrl}/feedback`);
+  return res.data; // { success: true, data: [...] }
+};
+
+export const deleteFeedbackAdmin = async (id) => {
+  const res = await Axios.delete(`${apiUrl}/feedback/${id}`);
+  return res.data;
+};
+
+export const editFeedbackAdmin = async (id, data) => {
+  const res = await Axios.put(`${apiUrl}/feedback/${id}`, data);
+  return res.data;
+};
+
+
+
+
+
 export async function getOrderDetails() {
   const response = await Axios.get(`${apiUrl}/get-order-details`);
   return response?.data;

@@ -54,6 +54,7 @@ const Layout = () => {
     // { path: Routers.EARNING_MANAGEMENT, label: "Accounts", icon: <GrMoney /> },
     { path: Routers.ADD_COUPON, label: "Offer Management", icon: <RiCoupon2Line /> },
     { path: Routers.Reviews, label: "Reviews", icon: <MdManageAccounts /> },
+    { path: Routers.Feedbacks, label: "Feedbacks", icon: <MdContentPasteGo /> },
     // { path: Routers.MANAGE_MEMBERS, label: "MR Management", icon: <MdManageAccounts /> },
     { path: Routers.ChangePassword, label: "Change Password", icon: <MdManageAccounts /> },
   ];

@@ -43,6 +43,7 @@ import MyIncome from "./MyIncome";
 import UserList from "./pages/AllUser";
 import ChangePasswordadmin from "./pages/ChangePasword";
 import GetAllReviews from "./pages/GetAllReviews";
+import GetAllFeedbacks from "./pages/GetAllFeedBack";
 
 const RoutersPages = () => {
   // Redux se login status check karo
@@ -101,6 +102,7 @@ const RoutersPages = () => {
               <Route path={Routers.UserList} element={<UserList/>}/>
               <Route path={Routers.ChangePassword} element={<ChangePasswordadmin/>}/>
               <Route path={Routers.Reviews} element={<GetAllReviews/>}/>
+              <Route path={Routers.Feedbacks} element={<GetAllFeedbacks/>}/>
             </Route>
 
             {/* 404 & fallback */}
