@@ -143,73 +143,92 @@ const Attribute = () => {
   };
 
   
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMessage({ text: "", kind: "" });
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setMessage({ text: "", kind: "" });
 
-    
-    if (!parentName.trim() && childInputs.every((c) => !c.trim()) && !parentSelectId) {
-      setMessage({ text: "Please provide a parent name or at least one child.", kind: "error" });
-      return;
-    }
+  const trimmedParent = parentName.trim();
+  const childTrimmed = childInputs.map((c) => c.trim()).filter(Boolean);
+  const targetParentId = parentSelectId || null;
 
-    const localCheck = checkLocalDuplicates();
-    if (!localCheck.ok) {
-      setMessage({ text: localCheck.msg, kind: "error" });
-      return;
-    }
-    if (localCheck.warn) {
-      setMessage({ text: localCheck.msg, kind: "info" });
-      
-    }
+  // Validation
+  if (!trimmedParent && childTrimmed.length === 0) {
+    setMessage({ text: "Provide a parent name or at least one child.", kind: "error" });
+    return;
+  }
 
-    setLoading(true);
-    try {
-      
-      if (editingId) {
-        await updateAttribute(editingId, { name: parentName.trim() });
-        setMessage({ text: "Attribute updated", kind: "success" });
-        await loadAttributes();
-        resetForm();
-        return;
-      }
+  // Duplicate children in form
+  const dupChild = childTrimmed.some((c, i) => childTrimmed.indexOf(c) !== i);
+  if (dupChild) {
+    setMessage({ text: "Duplicate names found among children in form.", kind: "error" });
+    return;
+  }
 
-      
-      let createdParentId = null;
-      if (parentName.trim()) {
-        const created = await createAttribute({ name: parentName.trim() });
-        createdParentId = created?._id;
-      }
+  // Child same as parent
+  if (trimmedParent && childTrimmed.includes(trimmedParent)) {
+    setMessage({ text: "One of the children has same name as parent.", kind: "error" });
+    return;
+  }
 
-     
-      const targetParentForChildren = createdParentId || parentSelectId || null;
+  // Parent global uniqueness
+  const existingParents = attributes.filter((a) => !a.parentAttribute);
+  if (!editingId && trimmedParent && existingParents.some((p) => p.name.toLowerCase() === trimmedParent.toLowerCase())) {
+    setMessage({ text: "A parent with this name already exists.", kind: "error" });
+    return;
+  }
 
-      
-      const safeChildNames = childInputs.map((c) => c.trim()).filter(Boolean);
-      if (safeChildNames.length > 0 && targetParentForChildren) {
-        
-        for (const cname of safeChildNames) {
-          await createAttribute({ name: cname, parentAttribute: targetParentForChildren });
-        }
-      } else if (safeChildNames.length > 0 && !targetParentForChildren) {
-        
-        for (const cname of safeChildNames) {
-          await createAttribute({ name: cname });
-        }
-      }
+  // Children uniqueness under same parent
+  const childrenUnderParent = attributes.filter(
+    (a) => (a.parentAttribute?._id || a.parentAttribute || null) === targetParentId
+  );
+  const childConflicts = childTrimmed.filter((c) =>
+    childrenUnderParent.some((child) => child.name.toLowerCase() === c.toLowerCase())
+  );
+  if (childConflicts.length) {
+    setMessage({ text: "Child name(s) already exist under this parent: " + childConflicts.join(", "), kind: "error" });
+    return;
+  }
 
-      setMessage({ text: "Created successfully", kind: "success" });
+  setLoading(true);
+  try {
+    // EDITING EXISTING ATTRIBUTE
+    if (editingId) {
+      await updateAttribute(editingId, { name: trimmedParent });
+      setMessage({ text: "Attribute updated", kind: "success" });
       await loadAttributes();
       resetForm();
-    } catch (err) {
-      console.error(err);
-      const errMsg = err?.response?.data?.message || err?.message || "Save failed";
-      setMessage({ text: errMsg, kind: "error" });
-    } finally {
-      setLoading(false);
+      return;
     }
-  };
 
+    // CREATE PARENT
+    let createdParentId = null;
+    if (trimmedParent) {
+      const created = await createAttribute({ name: trimmedParent });
+      createdParentId = created?._id;
+    }
+
+    // FINAL PARENT ID for children
+    const finalParentId = createdParentId || targetParentId || null;
+
+    // CREATE CHILDREN
+    for (const cname of childTrimmed) {
+      await createAttribute({
+        name: cname,
+        parentAttribute: finalParentId || undefined,
+      });
+    }
+
+    setMessage({ text: "Created successfully", kind: "success" });
+    await loadAttributes();
+    resetForm();
+  } catch (err) {
+    console.error(err);
+    const errMsg = err?.response?.data?.message || err?.message || "Save failed";
+    setMessage({ text: errMsg, kind: "error" });
+  } finally {
+    setLoading(false);
+  }
+};
  
   const handleEdit = (attr) => {
     setEditingId(attr._id);
