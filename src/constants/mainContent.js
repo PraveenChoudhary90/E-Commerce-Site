@@ -9,11 +9,13 @@ export const MainContent = {
 
 
 export const backendConfig = {
-  base: "http://localhost:8000/api",
+  // base: "http://localhost:8000/api",
+  base: "https://e-commerce-site-backend-1-258j.onrender.com/api",
 };
 
 export const Axios = axios.create({
-  baseURL: "http://localhost:8000/api",
+  // baseURL: "http://localhost:8000/api",
+  baseURL: "https://e-commerce-site-backend-1-258j.onrender.com/api",
   withCredentials: true,
 });
 
